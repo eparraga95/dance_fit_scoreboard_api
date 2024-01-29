@@ -7,9 +7,9 @@ import { UpdateScoreDto } from './dto/update-score.dto';
 export class ScoresController {
   constructor(private readonly scoresService: ScoresService) {}
 
-  @Post()
-  create(@Body() createScoreDto: CreateScoreDto) {
-    return this.scoresService.create(createScoreDto);
+  @Post(':id')
+  create(@Param('id') player_id, @Body() createScoreDto: CreateScoreDto) {
+    return this.scoresService.create(player_id, createScoreDto);
   }
 
   @Get()

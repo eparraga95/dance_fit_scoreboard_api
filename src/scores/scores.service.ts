@@ -1,26 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { CreateScoreDto } from './dto/create-score.dto';
-import { UpdateScoreDto } from './dto/update-score.dto';
+import { CreateScoreParams } from './dto/create-score.dto';
+import { UpdateScoreParams } from './dto/update-score.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Score } from './entities/score.entity';
+import { Repository } from 'typeorm';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
 export class ScoresService {
-  create(createScoreDto: CreateScoreDto) {
-    return 'This action adds a new score';
+  constructor(
+    @InjectRepository(Score) private scoreRepository: Repository<Score>,
+    @InjectRepository(Player) private playerRepository: Repository<Player>,
+  ) {}
+
+  async create(id: number, scoreDetails: CreateScoreParams) {
+    const player = await this.playerRepository.findOneBy({ player_id: id });
+
+    if (!player)
+      throw new HttpException(
+        'User not found. Cannot create Score',
+        HttpStatus.NOT_FOUND,
+      );
+
+    const newScore = this.scoreRepository.create({
+      ...scoreDetails,
+      created_at: new Date(),
+      player: player,
+    });
+
+    return this.scoreRepository.save(newScore);
   }
 
   findAll() {
-    return `This action returns all scores`;
+    return this.scoreRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} score`;
+    return this.scoreRepository.findOneBy({ score_id: id });
   }
 
-  update(id: number, updateScoreDto: UpdateScoreDto) {
-    return `This action updates a #${id} score`;
+  update(id: number, updateScoreDetails: UpdateScoreParams) {
+    return this.scoreRepository.update(
+      { score_id: id },
+      { ...updateScoreDetails },
+    );
   }
 
   remove(id: number) {
-    return `This action removes a #${id} score`;
+    return this.scoreRepository.delete({ score_id: id });
   }
 }

@@ -1,34 +1,41 @@
-import { Player } from "src/players/entities/player.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Event } from 'src/events/entities/event.entity';
+import { Player } from 'src/players/entities/player.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: 'scores'})
+@Entity({ name: 'scores' })
 export class Score {
-    @PrimaryGeneratedColumn({
-        type: 'bigint'
-    }) 
-    score_id: number;
+  @PrimaryGeneratedColumn({
+    type: 'bigint',
+  })
+  score_id: number;
 
-    @Column()
-    value: number;
+  @Column()
+  value: number;
 
-    @Column()
-    music: string;
+  @Column()
+  music: string;
 
-    @Column()
-    mode: string;
+  @Column()
+  mode: string;
 
-    @Column()
-    grade: string;
+  @Column()
+  level: number;
 
-    @Column()
-    plate: string;
+  @Column()
+  grade: string;
 
-    @Column()
-    validated: boolean;
+  @Column()
+  plate: string;
 
-    @Column()
-    created_at: string;
+  @Column({default: false})
+  validated: boolean;
 
-    @ManyToOne(() => Player, (player) => player.scores)
-    player: Player
+  @Column()
+  created_at: Date;
+
+  @ManyToOne(() => Player, (player) => player.scores)
+  player: Player;
+
+  @ManyToOne(() => Event, (event) => event.scores)
+  event: Event
 }
