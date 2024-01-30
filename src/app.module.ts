@@ -15,15 +15,11 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'parraga',
-      password: '@MySQLServer123',
-      database: 'dance_fit_scoreboard_db',
+      type: 'postgres',
+      url: process.env.postgresURL,
       entities: [Player, Score, Event],
       synchronize: true,
-      autoLoadEntities: true
+      autoLoadEntities: true,
     }),
     PlayersModule,
     ScoresModule,
