@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
 

@@ -23,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
       database: 'dance_fit_scoreboard_db',
       entities: [Player, Score, Event],
       synchronize: true,
+      autoLoadEntities: true
     }),
     PlayersModule,
     ScoresModule,

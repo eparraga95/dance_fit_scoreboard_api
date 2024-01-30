@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { AddPlayerDto } from './dto/add-player.dto';
-
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('events')
 export class EventsController {
@@ -14,9 +24,12 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/:id/add')
-  addPlayer(@Param('id') id: string, @Body() addPlayerDto: AddPlayerDto) {
-    // return this.eventsService.addPlayer(nickname ,id, addPlayerDto)
+  addPlayer(@Req() { user }, @Param('id') id: number) {
+    const { nickname } = user;
+
+    return this.eventsService.addPlayer(nickname, id);
   }
 
   @Get()

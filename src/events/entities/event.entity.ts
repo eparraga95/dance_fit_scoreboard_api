@@ -1,23 +1,31 @@
-import { Player } from "src/players/entities/player.entity";
-import { Score } from "src/scores/entities/score.entity";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Player } from 'src/players/entities/player.entity';
+import { Score } from 'src/scores/entities/score.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity({ name: 'events'})
+@Entity({ name: 'events' })
 export class Event {
-    @PrimaryGeneratedColumn({
-        type: 'bigint'
-    })
-    event_id: number;
+  @PrimaryGeneratedColumn({
+    type: 'bigint',
+  })
+  event_id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({default: true})
-    status: boolean;
+  @Column({ default: true })
+  status: boolean;
 
-    @ManyToMany(() => Player, (player) => player.events)
-    players: Player[]
+  @ManyToMany(() => Player, (player) => player.events, { eager: true })
+  @JoinTable()
+  players: Player[];
 
-    @OneToMany(() => Score, (score) => score.event)
-    scores: Score[]
+  @OneToMany(() => Score, (score) => score.event)
+  scores: Score[];
 }
