@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpdatePlayerParams } from './dto/update-player.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './entities/player.entity';
@@ -12,7 +12,14 @@ export class PlayersService {
   ) {}
 
   create(playerDetails: CreatePlayerParams) {
+    const { password, confirmPassowrd } = playerDetails;
+
+    if (!(password === confirmPassowrd)) {
+      throw new BadRequestException('Passwords must match');
+    }
+
     const newPlayer = this.playerRepository.create({ ...playerDetails });
+
     return this.playerRepository.save(newPlayer);
   }
 
