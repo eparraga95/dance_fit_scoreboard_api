@@ -18,7 +18,7 @@ import { AuthModule } from './auth/auth.module';
       type: 'postgres',
       url: process.env.postgresURL,
       entities: [Player, Score, Event],
-      synchronize: true,
+      synchronize: false,
       autoLoadEntities: true,
     }),
     PlayersModule,

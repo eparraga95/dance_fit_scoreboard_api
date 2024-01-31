@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -23,7 +22,7 @@ export class Player {
   password: string;
 
   @Column()
-  is_admin: boolean;
+  role: string;
 
   @OneToMany(() => Score, (score) => score.player)
   scores: Score[];
