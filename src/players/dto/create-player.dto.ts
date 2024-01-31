@@ -1,13 +1,13 @@
 export class CreatePlayerDto {
     nickname: string;
     password: string;
-    confirmPassowrd: string;
+    confirmPassword: string;
     is_admin: boolean;
 }
 
 export class CreatePlayerParams {
     nickname: string;
     password: string;
-    confirmPassowrd: string;
+    confirmPassword: string;
     is_admin: boolean;
 }

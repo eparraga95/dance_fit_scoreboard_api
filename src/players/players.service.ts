@@ -12,9 +12,11 @@ export class PlayersService {
   ) {}
 
   create(playerDetails: CreatePlayerParams) {
-    const { password, confirmPassowrd } = playerDetails;
+    const { password, confirmPassword } = playerDetails;
 
-    if (!(password === confirmPassowrd)) {
+    console.log( password, confirmPassword)
+
+    if (password != confirmPassword) {
       throw new BadRequestException('Passwords must match');
     }
 
