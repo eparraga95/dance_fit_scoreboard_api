@@ -4,11 +4,11 @@ import { CreatePlayerDto } from './create-player.dto';
 export class UpdatePlayerDto extends PartialType(CreatePlayerDto) {
     nickname: string;
     password: string;
-    is_admin: boolean;
+    role: string;
 }
 
 export type UpdatePlayerParams = {
     nickname: string
     password: string;
-    is_admin: boolean;
+    role: string;
 }
