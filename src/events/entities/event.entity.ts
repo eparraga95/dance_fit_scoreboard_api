@@ -22,6 +22,12 @@ export class Event {
   @Column({ default: true })
   status: boolean;
 
+  @Column()
+  starttime: string
+
+  @Column()
+  endtime: string
+
   @ManyToMany(() => Player, (player) => player.events, { eager: true })
   @JoinTable()
   players: Player[];
