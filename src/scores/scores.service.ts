@@ -14,8 +14,8 @@ export class ScoresService {
     @InjectRepository(Player) private playerRepository: Repository<Player>,
   ) {}
 
-  async create(id: number, scoreDetails: CreateScoreParams) {
-    const player = await this.playerRepository.findOneBy({ player_id: id });
+  async create(player_id: number, scoreDetails: CreateScoreParams) {
+    const player = await this.playerRepository.findOneBy({ player_id: player_id });
 
     if (!player)
       throw new HttpException(

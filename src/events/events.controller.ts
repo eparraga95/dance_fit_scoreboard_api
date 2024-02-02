@@ -12,7 +12,6 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { AddPlayerDto } from './dto/add-player.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('events')
@@ -26,10 +25,10 @@ export class EventsController {
 
   @UseGuards(AuthGuard)
   @Post('/:id/join')
-  addPlayer(@Req() { user }, @Param('id') id: number) {
-    const { nickname } = user;
+  addPlayer(@Req() { user }, @Param('id') event_id: number) {
+    const { player_id } = user;
 
-    return this.eventsService.addPlayer(nickname, id);
+    return this.eventsService.addPlayer(player_id, event_id);
   }
 
   @Get()

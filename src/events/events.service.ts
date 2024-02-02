@@ -1,10 +1,14 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateEventParams } from './dto/create-event.dto';
 import { UpdateEventDto, UpdateEventParams } from './dto/update-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Repository } from 'typeorm';
-import { AddPlayerParams } from './dto/add-player.dto';
 import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
@@ -19,12 +23,9 @@ export class EventsService {
     return this.eventRepository.save(newEvent);
   }
 
-  async addPlayer(
-    nickname: string,
-    event_id: number,
-  ) {
+  async addPlayer(player_id: number, event_id: number) {
     const player = await this.playerRepository.findOneBy({
-      nickname: nickname
+      player_id: player_id,
     });
 
     if (!player)
@@ -35,13 +36,13 @@ export class EventsService {
     if (!event)
       throw new HttpException('Event not found.', HttpStatus.NOT_FOUND);
 
-    if (event.players.filter(pl => pl.nickname === player.nickname)) {
-      throw new BadRequestException("Player already in event")
+    if (event.players.filter((pl) => pl.nickname === player.nickname).length > 0) {
+      throw new BadRequestException('Player already in event');
     }
-    
-    event.players = [ ...event.players, player]
 
-    return await this.eventRepository.save(event)
+    event.players = [...event.players, player];
+
+    return await this.eventRepository.save(event);
   }
 
   findAll() {
