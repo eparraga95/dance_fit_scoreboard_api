@@ -41,7 +41,11 @@ export class AuthService {
   async generateToken(payload: Player) {
     return {
       access_token: this.jwtService.sign(
-        { nickname: payload.nickname, player_id: payload.player_id },
+        {
+          nickname: payload.nickname,
+          player_id: payload.player_id,
+          role: payload.role,
+        },
         {
           secret: process.env.jwtSecret,
           expiresIn: '1h',

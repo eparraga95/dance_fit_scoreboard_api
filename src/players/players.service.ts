@@ -14,13 +14,14 @@ export class PlayersService {
   create(playerDetails: CreatePlayerParams) {
     const { password, confirmPassword } = playerDetails;
 
-    console.log( password, confirmPassword)
-
     if (password != confirmPassword) {
       throw new BadRequestException('Passwords must match');
     }
 
-    const newPlayer = this.playerRepository.create({ ...playerDetails });
+    const newPlayer = this.playerRepository.create({
+      ...playerDetails,
+      role: 'player',
+    });
 
     return this.playerRepository.save(newPlayer);
   }
