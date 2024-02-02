@@ -25,7 +25,7 @@ export class EventsController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/:id/add')
+  @Post('/:id/join')
   addPlayer(@Req() { user }, @Param('id') id: number) {
     const { nickname } = user;
 
