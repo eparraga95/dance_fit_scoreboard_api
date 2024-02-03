@@ -14,17 +14,19 @@ export class PlayersController {
     return this.playersService.create(createPlayerDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.playersService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.playersService.findOne(+id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updatePlayerDto: UpdatePlayerDto) {
     return this.playersService.update(id, updatePlayerDto);
