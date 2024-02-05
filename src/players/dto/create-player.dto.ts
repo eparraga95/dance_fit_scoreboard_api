@@ -8,5 +8,4 @@ export class CreatePlayerParams {
     nickname: string;
     password: string;
     confirmPassword: string;
-
 }
