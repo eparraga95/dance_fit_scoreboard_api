@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # ENV
 .env
+
+# Migration Commands Shortcut
+./db/migrations/migration_commands.txt

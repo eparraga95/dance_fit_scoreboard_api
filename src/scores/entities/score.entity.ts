@@ -1,6 +1,6 @@
 import { Event } from 'src/events/entities/event.entity';
 import { Player } from 'src/players/entities/player.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'scores' })
 export class Score {
@@ -33,7 +33,8 @@ export class Score {
   @Column()
   created_at: Date;
 
-  @ManyToOne(() => Player, (player) => player.scores)
+  @ManyToOne(() => Player, (player) => player.scores, { eager: true })
+  @JoinColumn()
   player: Player;
 
   @ManyToOne(() => Event, (event) => event.scores)

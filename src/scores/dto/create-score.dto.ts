@@ -7,6 +7,7 @@ export class CreateScoreDto {
   level: number;
   grade: string;
   plate: string;
+  event_id: number;
 }
 
 export type CreateScoreParams = {
@@ -16,4 +17,5 @@ export type CreateScoreParams = {
     level: number;
     grade: string;
     plate: string;
+    event_id: number;
 }
