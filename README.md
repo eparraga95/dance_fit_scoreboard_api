@@ -24,7 +24,7 @@
 
 | Method | Endpoint    | Name       | Auth                                           | Discription                                                             |
 |--------|-------------|------------|------------------------------------------------|-------------------------------------------------------------------------|
-| POST   | /events     | Create     | Bearer Token, roles: 'admin', 'player'         | Creates a new instance of Score and assigns it to the logged in Player. |
+| POST   | /events     | Create     | Bearer Token, roles: 'admin'         | Creates a new instance of Score and assigns it to the logged in Player. |
 | GET    | /events     | Find All   | no Auth                                        | Query for all Events                                                    |
 | GET    | /events/:id | Find By Id | no Auth                                        | Query for a Event by its score_id                                       |
 | PATCH  | /events/:id | Update     | Bearer Token, roles: 'admin', 'player' (owner) | Updates the Event's updatable data                                      |
