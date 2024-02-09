@@ -8,10 +8,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './local.auth';
 import { PlayersService } from 'src/players/players.service';
 import { ConfigModule } from '@nestjs/config';
+import { Session } from './entities/session.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Player]),
+    TypeOrmModule.forFeature([Player, Session]),
     PassportModule,
     JwtModule,
     ConfigModule
