@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Observable } from 'rxjs';
 import { Session } from './entities/session.entity';
 import { Repository } from 'typeorm';
 
@@ -38,7 +37,6 @@ export class AuthGuard implements CanActivate {
         secret: process.env.jwtSecret,
       });
     } catch (error) {
-      console.log(error);
       throw new UnauthorizedException();
     }
 
