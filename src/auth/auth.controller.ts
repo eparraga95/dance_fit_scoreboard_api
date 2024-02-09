@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { loginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
+import { AdminGuard } from './admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +17,11 @@ export class AuthController {
     @Delete('/logout')
     async logout() {
         return this.authService.removeSession()
+    }
+
+    @UseGuards(AuthGuard, AdminGuard)
+    @Get('/admin')
+    async adminAuth() {
+        return true
     }
 }

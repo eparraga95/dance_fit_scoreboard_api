@@ -79,8 +79,6 @@ export class AuthService {
   async removeSession() {
     const token = this.request.headers.authorization.split(' ')[1];
 
-    console.log(token)
-
     const session = await this.sessionRepository.findOneBy({ token: token });
 
     await this.sessionRepository.delete(session);
