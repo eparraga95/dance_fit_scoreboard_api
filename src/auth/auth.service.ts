@@ -79,9 +79,7 @@ export class AuthService {
   async removeSession() {
     const token = this.request.headers.authorization.split(' ')[1];
 
-    const session = await this.sessionRepository.findOneBy({ token: token });
-
-    await this.sessionRepository.delete(session);
+    const session = await this.sessionRepository.delete({ token: token });
 
     return {
       message: 'Logged out succesfully',
