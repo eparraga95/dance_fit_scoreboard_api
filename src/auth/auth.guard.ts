@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from './entities/session.entity';
 import { Repository } from 'typeorm';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,28 +19,34 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    try {
-      const request = context.switchToHttp().getRequest();
-      const requestToken: string = request.headers.authorization.split(' ')[1];
+    const request = context.switchToHttp().getRequest();
+    const requestToken: string = request.headers.authorization.split(' ')[1];
 
-      if (!requestToken) {
-        throw new UnauthorizedException();
-      }
-
-      const session = await this.sessionRepository.findOne({
-        where: { token: requestToken },
-      });
-
-      if (requestToken !== session.token) {
-        throw new UnauthorizedException();
-      }
-
-      request.user = this.jwtService.verify(session.token, {
-        secret: process.env.jwtSecret,
-      });
-    } catch (error) {
-      throw new UnauthorizedException();
+    if (!requestToken) {
+      throw new UnauthorizedException('No Token Found');
     }
+
+    const session = await this.sessionRepository.findOne({
+      where: { token: requestToken },
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    const now = new Date();
+
+    const decodedJwt = this.jwtService.decode(session.token);
+
+    const jwtExpiration = new Date(decodedJwt.exp * 1000);
+
+    if (now > jwtExpiration) {
+      throw new UnauthorizedException('Session expired');
+    }
+
+    request.user = this.jwtService.verify(session.token, {
+      secret: process.env.jwtSecret,
+    });
 
     return true;
   }
