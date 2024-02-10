@@ -37,7 +37,7 @@ export class ScoresController {
     return this.scoresService.findOne(+id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, AdminGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateScoreDto: UpdateScoreDto) {
     return this.scoresService.update(+id, updateScoreDto);
