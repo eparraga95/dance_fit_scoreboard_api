@@ -19,9 +19,16 @@ export class AuthController {
         return this.authService.removeSession()
     }
 
+    @UseGuards(AuthGuard)
+    @Get('/session')
+    async sessionAuth() {
+        return true
+    }
+
     @UseGuards(AuthGuard, AdminGuard)
     @Get('/admin')
     async adminAuth() {
         return true
     }
+
 }
