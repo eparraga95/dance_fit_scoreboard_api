@@ -40,6 +40,7 @@ The idea is to make it possible so a player can send a picture of their scores a
 | POST   | /auth/login  | Login       | No Auth                                | Authenticates the Player into the system storing a Session Entity bound on a 1:1 relation |
 | DELETE | /auth/logout | Logout      | Bearer Token, roles: 'admin', 'player' | Removes the Sesson entity bound to the Player identified by the Request    |
 | GET    | /auth/admin  | Check Admin | Bearer Token, roles: 'admin'           | Returns true if the Player has Admin rights                                               |
+| GET    | /auth/session  | Check Session | Bearer Token, roles: 'admin', 'player'           | Returns true if the Player has a valid server-side Session, or Expiration/Invalid JWT errors                                               |
 
 ### Scores
 ---
