@@ -8,9 +8,15 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { Event } from 'src/events/entities/event.entity';
 import { Session } from 'src/auth/entities/session.entity';
+import { Music } from 'src/musics/entities/music.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Score, Player, Event, Session]), AuthModule, JwtModule],
+  imports: [
+    TypeOrmModule.forFeature([Score, Player, Event, Session, Music, Category]),
+    AuthModule,
+    JwtModule,
+  ],
   controllers: [ScoresController],
   providers: [ScoresService],
 })

@@ -1,16 +1,14 @@
 import { JwtService } from '@nestjs/jwt';
 import {
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from 'src/players/entities/player.entity';
 import { Repository } from 'typeorm';
 import { loginParams } from './dto/login.dto';
-import { ConfigService } from '@nestjs/config';
 import { Session } from './entities/session.entity';
 import { REQUEST } from '@nestjs/core';
 
@@ -31,16 +29,13 @@ export class AuthService {
     });
 
     if (!player)
-      throw new HttpException(
-        'Player not found. Cannot login',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException('Player nickname/password incorrect');
 
     if (player.password === password) {
       return await this.createSession(player);
     }
 
-    throw new UnauthorizedException('Player not found. Cannot login');
+    throw new UnauthorizedException('Player nickname/password incorrect');
   }
 
   async createSession(player: Player) {
@@ -79,7 +74,7 @@ export class AuthService {
   async removeSession() {
     const token = this.request.headers.authorization.split(' ')[1];
 
-    const session = await this.sessionRepository.delete({ token: token });
+    await this.sessionRepository.delete({ token: token });
 
     return {
       message: 'Logged out succesfully',

@@ -1,6 +1,14 @@
+import { Category } from 'src/categories/entities/category.entity';
 import { Event } from 'src/events/entities/event.entity';
+import { Music } from 'src/musics/entities/music.entity';
 import { Player } from 'src/players/entities/player.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'scores' })
 export class Score {
@@ -13,30 +21,27 @@ export class Score {
   value: number;
 
   @Column()
-  music: string;
-
-  @Column()
-  mode: string;
-
-  @Column()
-  level: number;
-
-  @Column()
   grade: string;
 
   @Column()
   plate: string;
 
-  @Column({default: false})
+  @Column({ default: false })
   validated: boolean;
 
   @Column()
   created_at: Date;
 
-  @ManyToOne(() => Player, (player) => player.scores, { eager: true })
+  @ManyToOne(() => Player, (player) => player.scores)
   @JoinColumn()
   player: Player;
 
   @ManyToOne(() => Event, (event) => event.scores)
-  event: Event
+  event: Event;
+
+  @ManyToOne(() => Category, (category) => category.scores)
+  category: Category;
+
+  @ManyToOne(() => Music, (music) => music.scores)
+  music: Music;
 }

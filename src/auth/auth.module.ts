@@ -15,9 +15,9 @@ import { Session } from './entities/session.entity';
     TypeOrmModule.forFeature([Player, Session]),
     PassportModule,
     JwtModule,
-    ConfigModule
+    ConfigModule,
   ],
   providers: [AuthService, LocalStrategy, PlayersService],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}

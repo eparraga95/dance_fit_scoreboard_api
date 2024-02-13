@@ -1,7 +1,6 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from './entities/session.entity';
 import { Repository } from 'typeorm';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -47,7 +45,7 @@ export class AuthGuard implements CanActivate {
     request.user = this.jwtService.verify(session.token, {
       secret: process.env.jwtSecret,
     });
-    
+
     return true;
   }
 }
