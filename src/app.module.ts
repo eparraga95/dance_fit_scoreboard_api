@@ -8,7 +8,8 @@ import { EventsModule } from './events/events.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { dataSourceOptions } from 'db/data-source';
-
+import { MusicsModule } from './musics/musics.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -18,6 +19,8 @@ import { dataSourceOptions } from 'db/data-source';
     ScoresModule,
     EventsModule,
     AuthModule,
+    MusicsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

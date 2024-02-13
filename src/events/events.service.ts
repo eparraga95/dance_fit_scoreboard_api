@@ -1,11 +1,10 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateEventParams } from './dto/create-event.dto';
-import { UpdateEventDto, UpdateEventParams } from './dto/update-event.dto';
+import { UpdateEventParams } from './dto/update-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Repository } from 'typeorm';
@@ -28,15 +27,15 @@ export class EventsService {
       player_id: player_id,
     });
 
-    if (!player)
-      throw new HttpException('Player not found.', HttpStatus.NOT_FOUND);
+    if (!player) throw new NotFoundException('Player not found');
 
     const event = await this.eventRepository.findOneBy({ event_id: event_id });
 
-    if (!event)
-      throw new HttpException('Event not found.', HttpStatus.NOT_FOUND);
+    if (!event) throw new NotFoundException('Event not found');
 
-    if (event.players.filter((pl) => pl.nickname === player.nickname).length > 0) {
+    if (
+      event.players.filter((pl) => pl.nickname === player.nickname).length > 0
+    ) {
       throw new BadRequestException('Player already in event');
     }
 

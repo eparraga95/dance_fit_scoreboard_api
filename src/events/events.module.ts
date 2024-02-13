@@ -9,7 +9,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { Session } from 'src/auth/entities/session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Event, Player, Session]), AuthModule, JwtModule],
+  imports: [
+    TypeOrmModule.forFeature([Event, Player, Session]),
+    AuthModule,
+    JwtModule,
+  ],
   controllers: [EventsController],
   providers: [EventsService],
 })
