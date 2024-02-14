@@ -17,9 +17,20 @@ export class EventsService {
     @InjectRepository(Player) private playerRepository: Repository<Player>,
   ) {}
 
-  create(createEventDetails: CreateEventParams) {
+  async create(createEventDetails: CreateEventParams) {
+    const { name } = createEventDetails;
+
+    const sameNameEvent = await this.eventRepository.findOne({
+      where: { name: name },
+    });
+
+    if (sameNameEvent) {
+      throw new BadRequestException('Same name Event already exists');
+    }
+
     const newEvent = this.eventRepository.create({ ...createEventDetails });
-    return this.eventRepository.save(newEvent);
+
+    return await this.eventRepository.save(newEvent);
   }
 
   async addPlayer(player_id: number, event_id: number) {
@@ -36,7 +47,7 @@ export class EventsService {
     if (
       event.players.filter((pl) => pl.nickname === player.nickname).length > 0
     ) {
-      throw new BadRequestException('Player already in event');
+      throw new BadRequestException('Player already in Event');
     }
 
     event.players = [...event.players, player];
@@ -44,22 +55,52 @@ export class EventsService {
     return await this.eventRepository.save(event);
   }
 
-  findAll() {
-    return this.eventRepository.find();
+  async findAll() {
+    return await this.eventRepository.find({
+      relations: {
+        categories: true,
+        players: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return this.eventRepository.findOneBy({ event_id: id });
+  async findOne(id: number) {
+    const event = await this.eventRepository.findOne({
+      where: { event_id: id },
+      relations: { players: true, categories: true, scores: true },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    return event;
   }
 
-  update(id: number, updateEventDetails: UpdateEventParams) {
+  async update(id: number, updateEventDetails: UpdateEventParams) {
+    const event = await this.eventRepository.findOne({
+      where: { event_id: id },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
     return this.eventRepository.update(
       { event_id: id },
       { ...updateEventDetails },
     );
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const event = await this.eventRepository.findOne({
+      where: { event_id: id },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
     return this.eventRepository.delete({ event_id: id });
   }
 }

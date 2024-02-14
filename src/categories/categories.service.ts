@@ -12,6 +12,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { AddMusicParams } from './dto/add-music.dto';
 import { Music } from 'src/musics/entities/music.entity';
 import { RemoveMusicParams } from './dto/remove-music.dto';
+import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -20,6 +21,7 @@ export class CategoriesService {
     private categoryRepository: Repository<Category>,
     @InjectRepository(Event) private eventRepository: Repository<Event>,
     @InjectRepository(Music) private musicRepository: Repository<Music>,
+    @InjectRepository(Player) private playerRepository: Repository<Player>,
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
@@ -103,31 +105,133 @@ export class CategoriesService {
       throw new NotFoundException('Music not found');
     }
 
+    if (category.musics.filter((m) => m.music_id == music_id).length === 0) {
+      throw new BadRequestException('Music is not assigned to this Category');
+    }
+
     category.musics = category.musics.filter((m) => m.music_id != music_id);
 
     return await this.categoryRepository.save(category);
   }
 
-  findAll() {
-    return this.categoryRepository.find({
+  async findAll() {
+    return await this.categoryRepository.find({
       relations: {
         musics: true,
+        players: true,
       },
     });
   }
 
-  findOne(id: number) {
-    return this.categoryRepository.findOneBy({ category_id: id });
+  async findOne(id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+      relations: {
+        musics: true,
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return category;
   }
 
-  update(id: number, updateCategoryDetails: UpdateCategoryParams) {
-    return this.categoryRepository.update(
-      { category_id: id },
-      { ...updateCategoryDetails },
-    );
+  async update(id: number, updateCategoryDetails: UpdateCategoryParams) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return this.categoryRepository.update(category, {
+      ...updateCategoryDetails,
+    });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
     return this.categoryRepository.delete({ category_id: id });
+  }
+
+  async addPlayer(player_id: number, category_id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: {
+        category_id: category_id,
+      },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    if (category.players.filter((p) => p.player_id === player_id).length > 0) {
+      throw new BadRequestException('Player already assigned to this Category');
+    }
+
+    const player = await this.playerRepository.findOne({
+      where: {
+        player_id: player_id,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    category.players = [...category.players, player];
+
+    return await this.categoryRepository.save(category);
+  }
+
+  async removePlayer(player_id: number, category_id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: {
+        category_id: category_id,
+      },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    console.log(category.players.filter((p) => p.player_id != player_id));
+
+    if (category.players.filter((p) => p.player_id == player_id).length === 0) {
+      throw new BadRequestException('Player is not assigned to this Category');
+    }
+
+    const player = await this.playerRepository.findOne({
+      where: {
+        player_id: player_id,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    category.players = category.players.filter(
+      (p) => p.player_id != player.player_id,
+    );
+
+    return await this.categoryRepository.save(category);
   }
 }

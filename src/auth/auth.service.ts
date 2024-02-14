@@ -64,7 +64,7 @@ export class AuthService {
 
     const newSession = this.sessionRepository.create(newSessionData);
 
-    this.sessionRepository.save(newSession);
+    await this.sessionRepository.save(newSession);
 
     return {
       access_token: newSessionData.token,

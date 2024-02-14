@@ -25,8 +25,9 @@ export class ScoresService {
   ) {}
 
   async create(player_id: number, scoreDetails: CreateScoreParams) {
-    const player = await this.playerRepository.findOneBy({
-      player_id: player_id,
+    const player = await this.playerRepository.findOne({
+      where: { player_id: player_id },
+      relations: { events: true },
     });
 
     if (!player) {
@@ -42,13 +43,9 @@ export class ScoresService {
       },
     });
 
-    console.log(event);
-
     if (!event) throw new NotFoundException('Event not Found');
 
-    if (
-      event.players.filter((pl) => pl.nickname === player.nickname).length === 0
-    ) {
+    if (player.events.filter((e) => e.name == event.name).length === 0) {
       throw new BadRequestException(
         'Player is not a participant of selected Event',
       );
@@ -73,8 +70,13 @@ export class ScoresService {
       throw new NotFoundException('Music not found');
     }
 
-    const category = await this.categoryRepository.findOneBy({
-      category_id: category_id,
+    const category = await this.categoryRepository.findOne({
+      where: {
+        category_id: category_id,
+      },
+      relations: {
+        players: true,
+      },
     });
 
     if (!category) {
@@ -82,10 +84,33 @@ export class ScoresService {
     }
 
     if (
+      category.players.filter((p) => p.nickname == player.nickname).length === 0
+    ) {
+      throw new BadRequestException(
+        'Player is not assigned to this Category in this Event',
+      );
+    }
+
+    if (
       music.categories.filter((c) => c.category_id == category_id).length === 0
     ) {
       throw new BadRequestException(
         'This Music is not assigned to this Category in this Event',
+      );
+    }
+
+    const identicalScore = await this.scoreRepository.findOne({
+      where: {
+        player: player,
+        event: event,
+        category: category,
+        music: music,
+      },
+    });
+
+    if (identicalScore) {
+      throw new BadRequestException(
+        'There can be only one instance of a Score created by a Player to a Music, inside a Category, inside of an Event',
       );
     }
 
@@ -102,25 +127,72 @@ export class ScoresService {
       category: category,
     });
 
-    return this.scoreRepository.save(newScore);
+    await this.scoreRepository.save(newScore);
+
+    return await this.scoreRepository.findOne({
+      where: { score_id: newScore.score_id },
+      relations: {
+        player: true,
+        event: true,
+        category: true,
+        music: true,
+      },
+    });
   }
 
-  findAll() {
-    return this.scoreRepository.find();
+  async findAll() {
+    return await this.scoreRepository.find({
+      relations: {
+        player: true,
+        music: true,
+        event: true,
+        category: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return this.scoreRepository.findOneBy({ score_id: id });
+  async findOne(id: number) {
+    const score = await this.scoreRepository.findOne({
+      where: { score_id: id },
+      relations: {
+        player: true,
+        event: true,
+        category: true,
+        music: true,
+      },
+    });
+
+    if (!score) {
+      throw new NotFoundException('Score not found');
+    }
+
+    return score;
   }
 
-  update(id: number, updateScoreDetails: UpdateScoreParams) {
+  async update(id: number, updateScoreDetails: UpdateScoreParams) {
+    const score = await this.scoreRepository.findOne({
+      where: { score_id: id },
+    });
+
+    if (!score) {
+      throw new NotFoundException('Score not found');
+    }
+
     return this.scoreRepository.update(
       { score_id: id },
       { ...updateScoreDetails },
     );
   }
 
-  remove(id: number) {
-    return this.scoreRepository.delete({ score_id: id });
+  async remove(id: number) {
+    const score = await this.scoreRepository.findOne({
+      where: { score_id: id },
+    });
+
+    if (!score) {
+      throw new NotFoundException('Score not found');
+    }
+
+    return this.scoreRepository.delete(score);
   }
 }
