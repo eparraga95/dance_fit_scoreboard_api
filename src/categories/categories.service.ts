@@ -23,6 +23,7 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
+    
     const { event_id, name, level_max, level_min } = createCategoryDetails;
 
     const event = await this.eventRepository.findOneBy({ event_id: event_id });
@@ -42,6 +43,7 @@ export class CategoriesService {
   }
 
   async addMusic(category_id: number, addMusicDetails: AddMusicParams) {
+
     const category = await this.categoryRepository.findOne({
       where: { category_id: category_id },
       relations: {
@@ -108,26 +110,54 @@ export class CategoriesService {
     return await this.categoryRepository.save(category);
   }
 
-  findAll() {
-    return this.categoryRepository.find({
+  async findAll() {
+    return await this.categoryRepository.find({
       relations: {
         musics: true,
+        players: true,
       },
     });
   }
 
-  findOne(id: number) {
-    return this.categoryRepository.findOneBy({ category_id: id });
+  async findOne(id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+      relations: {
+        musics: true,
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return category;
   }
 
-  update(id: number, updateCategoryDetails: UpdateCategoryParams) {
-    return this.categoryRepository.update(
-      { category_id: id },
-      { ...updateCategoryDetails },
-    );
+  async update(id: number, updateCategoryDetails: UpdateCategoryParams) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return this.categoryRepository.update(category, {
+      ...updateCategoryDetails,
+    });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
     return this.categoryRepository.delete({ category_id: id });
   }
 }

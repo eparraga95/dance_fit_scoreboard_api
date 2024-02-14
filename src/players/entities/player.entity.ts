@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity({ name: 'players' })
 export class Player {
@@ -29,4 +30,7 @@ export class Player {
 
   @ManyToMany(() => Event, (event) => event.players)
   events: Event[];
+
+  @ManyToMany(() => Category, (category) => category.players)
+  categories: Category[]
 }

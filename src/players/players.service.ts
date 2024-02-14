@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdatePlayerParams } from './dto/update-player.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './entities/player.entity';
@@ -11,7 +15,7 @@ export class PlayersService {
     @InjectRepository(Player) private playerRepository: Repository<Player>,
   ) {}
 
-  create(playerDetails: CreatePlayerParams) {
+  async create(playerDetails: CreatePlayerParams) {
     const { password, confirmPassword } = playerDetails;
 
     if (password != confirmPassword) {
@@ -23,25 +27,57 @@ export class PlayersService {
       role: 'player',
     });
 
-    return this.playerRepository.save(newPlayer);
+    return await this.playerRepository.save(newPlayer);
   }
 
-  findAll() {
-    return this.playerRepository.find();
+  async findAll() {
+    return await this.playerRepository.find({
+      relations: {
+        scores: { category: true, music: true, event: true },
+        events: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return this.playerRepository.findOneBy({ player_id: id });
+  async findOne(id: number) {
+    
+    const player = await this.playerRepository.findOne({
+      where: { player_id: id },
+      relations: {
+        scores: { category: true, music: true, event: true },
+        events: true,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    return player;
   }
 
-  update(id: number, updatePlayerDetails: UpdatePlayerParams) {
-    return this.playerRepository.update(
+  async update(id: number, updatePlayerDetails: UpdatePlayerParams) {
+    const player = this.playerRepository.findOne({ where: { player_id: id } });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    return await this.playerRepository.update(
       { player_id: id },
       { ...updatePlayerDetails },
     );
   }
 
-  remove(id: number) {
-    return this.playerRepository.delete(id);
+  async remove(id: number) {
+    const player = await this.playerRepository.findOne({
+      where: { player_id: id },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    return this.playerRepository.delete(player);
   }
 }

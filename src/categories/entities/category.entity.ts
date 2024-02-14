@@ -1,5 +1,6 @@
 import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
+import { Player } from 'src/players/entities/player.entity';
 import { Score } from 'src/scores/entities/score.entity';
 import {
   Column,
@@ -38,4 +39,8 @@ export class Category {
 
   @ManyToOne(() => Event, (event) => event.categories)
   event: Event;
+
+  @ManyToMany(() => Player, (player) => player.categories)
+  @JoinTable()
+  players: Player[]
 }

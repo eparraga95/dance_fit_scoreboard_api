@@ -26,7 +26,7 @@ export class EventsController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/:id/join')
+  @Patch('/:id/join')
   addPlayer(@Req() { user }, @Param('id') event_id: number) {
     const { player_id } = user;
 
