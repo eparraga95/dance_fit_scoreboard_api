@@ -9,10 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { Session } from 'src/auth/entities/session.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { Player } from 'src/players/entities/player.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category, Music, Score, Event, Session]),
+    TypeOrmModule.forFeature([Category, Music, Score, Event, Session, Player]),
     JwtModule,
     AuthModule,
   ],

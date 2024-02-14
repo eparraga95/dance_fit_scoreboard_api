@@ -89,4 +89,6 @@ The idea is to make it possible so a player can send a picture of their scores a
 | DELETE | /categories/:id        | Delete       | Bearer token, roles: 'admin' | Deletes a Category                                                                             |
 | PATCH  | /categories/:id/add    | Add Music    | Bearer token, roles: 'admin' | Enrolls a Music instance to a Category's music list                                            |
 | PATCH  | /categories/:id/remove | Remove Music | Bearer token, roles: 'admin' | Removes a Music from a Category's music list                                                   |
+| PATCH  | /categories/:id/join   | Add Player    | Bearer token, roles: 'admin' | Enrolls a Player instance to a Category's player list                                            |
+| PATCH  | /categories/:id/leave | Remove Player | Bearer token, roles: 'admin' | Removes a Player from a Category's player list                                                   |
 

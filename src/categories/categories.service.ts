@@ -12,6 +12,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { AddMusicParams } from './dto/add-music.dto';
 import { Music } from 'src/musics/entities/music.entity';
 import { RemoveMusicParams } from './dto/remove-music.dto';
+import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -20,10 +21,10 @@ export class CategoriesService {
     private categoryRepository: Repository<Category>,
     @InjectRepository(Event) private eventRepository: Repository<Event>,
     @InjectRepository(Music) private musicRepository: Repository<Music>,
+    @InjectRepository(Player) private playerRepository: Repository<Player>,
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
-    
     const { event_id, name, level_max, level_min } = createCategoryDetails;
 
     const event = await this.eventRepository.findOneBy({ event_id: event_id });
@@ -43,7 +44,6 @@ export class CategoriesService {
   }
 
   async addMusic(category_id: number, addMusicDetails: AddMusicParams) {
-
     const category = await this.categoryRepository.findOne({
       where: { category_id: category_id },
       relations: {
@@ -105,6 +105,10 @@ export class CategoriesService {
       throw new NotFoundException('Music not found');
     }
 
+    if (category.musics.filter((m) => m.music_id == music_id).length === 0) {
+      throw new BadRequestException('Music is not assigned to this Category');
+    }
+
     category.musics = category.musics.filter((m) => m.music_id != music_id);
 
     return await this.categoryRepository.save(category);
@@ -159,5 +163,75 @@ export class CategoriesService {
     }
 
     return this.categoryRepository.delete({ category_id: id });
+  }
+
+  async addPlayer(player_id: number, category_id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: {
+        category_id: category_id,
+      },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    if (category.players.filter((p) => p.player_id === player_id).length > 0) {
+      throw new BadRequestException('Player already assigned to this Category');
+    }
+
+    const player = await this.playerRepository.findOne({
+      where: {
+        player_id: player_id,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    category.players = [...category.players, player];
+
+    return await this.categoryRepository.save(category);
+  }
+
+  async removePlayer(player_id: number, category_id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: {
+        category_id: category_id,
+      },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    console.log(category.players.filter((p) => p.player_id != player_id));
+
+    if (category.players.filter((p) => p.player_id == player_id).length === 0) {
+      throw new BadRequestException('Player is not assigned to this Category');
+    }
+
+    const player = await this.playerRepository.findOne({
+      where: {
+        player_id: player_id,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    category.players = category.players.filter(
+      (p) => p.player_id != player.player_id,
+    );
+
+    return await this.categoryRepository.save(category);
   }
 }
