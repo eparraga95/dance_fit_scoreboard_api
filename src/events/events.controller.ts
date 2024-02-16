@@ -33,11 +33,13 @@ export class EventsController {
     return this.eventsService.addPlayer(player_id, event_id);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.eventsService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventsService.findOne(+id);

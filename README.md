@@ -16,7 +16,7 @@ The idea is to make it possible so a player can send a picture of their scores a
 ### Database 
 ---
 
-![Entity Relationship Diagram](/assets/img/DER_140224_1015.png "Entity Relationship Diagram")
+[DER](https://drive.google.com/file/d/1KAU0JEU8DdWM1R7v2y-Tcyr53HXbp22q/view?usp=drive_link)
 
 ## Endpoint Overview
 
@@ -26,7 +26,7 @@ The idea is to make it possible so a player can send a picture of their scores a
 
 | Method | Endpoint     | Name        | Auth                                   | Discription                                                                               |
 |--------|--------------|-------------|----------------------------------------|-------------------------------------------------------------------------------------------|
-| POST   | /players | Create Player | No Auth                                        | Creates a new Player instance and stores it in the DB, allowing for said player future Login. |
+| POST   | /players | Create Player | No Auth                                        | Creates a new Player, allowing for said player future Login. |
 | GET    | /players        | Find All      | Bearer Token, roles: 'admin', 'player'         | Query for all Players                                                                   |
 | GET    | /players/:id    | Find By Id    | Bearer Token, roles: 'admin', 'player' | Query for a Player by its player_id                                                       |
 | PATCH  | /players/:id    | Update        | Bearer Token, roles: 'admin' | Updates the Player's updatable data                                                       |
@@ -59,8 +59,8 @@ The idea is to make it possible so a player can send a picture of their scores a
 | Method | Endpoint    | Name       | Auth                                           | Discription                                                             |
 |--------|-------------|------------|------------------------------------------------|-------------------------------------------------------------------------|
 | POST   | /events     | Create     | Bearer Token, roles: 'admin'         | Creates a new instance of Score and assigns it to the logged in Player. |
-| GET    | /events     | Find All   | no Auth                                        | Query for all Events                                                    |
-| GET    | /events/:id | Find By Id | no Auth                                        | Query for an Event by its score_id                                       |
+| GET    | /events     | Find All   | Bearer Token, roles: 'player', 'admin'                                        | Query for all Events                                                    |
+| GET    | /events/:id | Find By Id | Bearer Token, roles: 'player', 'admin'                                      | Query for an Event by its score_id                                       |
 | PATCH  | /events/:id | Update     | Bearer Token, roles: 'admin' | Updates the Event's updatable data                                      |
 | DELETE | /events/:id | Delete     | Bearer Token, roles: 'admin'                   | Deletes an Event instance                                               |
 | POST   | /events/:id/join | Join Event | Bearer Token, roles: 'admin', 'player' | Enrolls a Player instance to an Event instance |
@@ -72,8 +72,8 @@ The idea is to make it possible so a player can send a picture of their scores a
 | Method | Endpoint    | Name       | Auth                         | Discription                        |
 |--------|-------------|------------|------------------------------|------------------------------------|
 | POST   | /musics     | Create     | Bearer token, roles: 'admin' | Creates a new instance of Music    |
-| GET    | /musics     | Find All   | Bearer token, roles: 'player' | Query for all Musics               |
-| GET    | /musics/:id | Find By Id | Bearer token, roles: 'player' | Query for a Music by its music_id  |
+| GET    | /musics     | Find All   | Bearer token, roles: 'player', 'admin' | Query for all Musics               |
+| GET    | /musics/:id | Find By Id | Bearer token, roles: 'player', 'admin' | Query for a Music by its music_id  |
 | PATCH  | /musics/:id | Update     | Bearer token, roles: 'admin' | Updates the Music's updatable data |
 | DELETE | /musics/:id | Delete     | Bearer token, roles: 'admin' | Deletes a Music                    |
 
@@ -83,12 +83,22 @@ The idea is to make it possible so a player can send a picture of their scores a
 | Method | Endpoint               | Name         | Auth                         | Discription                                                                                    |
 |--------|------------------------|--------------|------------------------------|------------------------------------------------------------------------------------------------|
 | POST   | /categories            | Create       | Bearer token, roles: 'admin' | Creates a new instance of Category bound to the Event by the event_id sent in the request Body |
-| GET    | /categories            | Find All     | Bearer token, roles: 'player' | Query for all Categories                                                                       |
-| GET    | /categories/:id        | Find By Id   | Bearer token, roles: 'player' | Query for a Category by its category_id                                                        |
+| GET    | /categories            | Find All     | Bearer token, roles: 'player', 'admin' | Query for all Categories                                                                       |
+| GET    | /categories/:id        | Find By Id   | Bearer token, roles: 'player','admin' | Query for a Category by its category_id                                                        |
 | PATCH  | /categories/:id        | Update       | Bearer token, roles: 'admin' | Updates a Category's updatable data                                                            |
 | DELETE | /categories/:id        | Delete       | Bearer token, roles: 'admin' | Deletes a Category                                                                             |
-| PATCH  | /categories/:id/add    | Add Music    | Bearer token, roles: 'admin' | Enrolls a Music instance to a Category's music list                                            |
-| PATCH  | /categories/:id/remove | Remove Music | Bearer token, roles: 'admin' | Removes a Music from a Category's music list                                                   |
 | PATCH  | /categories/:id/join   | Add Player    | Bearer token, roles: 'player' | Enrolls a Player instance to a Category's player list                                            |
 | PATCH  | /categories/:id/leave | Remove Player | Bearer token, roles: 'player' | Removes a Player from a Category's player list                                                   |
 
+### Phases
+---
+
+| Method | Endpoint                 | Name         | Auth                         | Discription                                                                                       |
+|--------|--------------------------|--------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| POST   | /phases                  | Create       | Bearer token, roles: 'admin' | Creates a new instance of Phase bound to the Category by the category_id sent in the request Body |
+| GET    | /phases                  | Find All     | Bearer token, roles: 'player', 'admin' | Query for all Phases                                                                              |
+| GET    | /phases/:id              | Find By Id   | Bearer token, roles: 'player', 'admin' | Query for a Phase by its phase_id                                                                 |
+| PATCH  | /phases/:id              | Update       | Bearer token, roles: 'admin' | Updates a Phase's updatable data                                                                  |
+| DELETE | /phases/:id              | Delete       | Bearer token, roles: 'admin' | Deletes a Phases by its phase_id                                                                  |
+| PATCH  | /phases/:id/add_music    | Add Music    | Bearer token, roles: 'admin' | Enrolls a Music instance to a Phase's music list                                                  |
+| PATCH  | /phases/:id/remove_music | Remove Music | Bearer token, roles: 'admin' | Removes a Music from a Phase's music list                                                         |
