@@ -7,6 +7,7 @@ export class CreateScoreDto {
   event_id: number;
   music_id: number;
   category_id: number;
+  phase_id: number
 }
 
 export type CreateScoreParams = {
@@ -16,4 +17,5 @@ export type CreateScoreParams = {
   event_id: number;
   music_id: number;
   category_id: number;
+  phase_id: number;
 };

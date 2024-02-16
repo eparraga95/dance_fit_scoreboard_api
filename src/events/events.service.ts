@@ -40,7 +40,14 @@ export class EventsService {
 
     if (!player) throw new NotFoundException('Player not found');
 
-    const event = await this.eventRepository.findOneBy({ event_id: event_id });
+    const event = await this.eventRepository.findOne({
+      where: {
+        event_id: event_id
+      },
+      relations: {
+        players: true
+      }
+    })
 
     if (!event) throw new NotFoundException('Event not found');
 
@@ -67,7 +74,11 @@ export class EventsService {
   async findOne(id: number) {
     const event = await this.eventRepository.findOne({
       where: { event_id: id },
-      relations: { players: true, categories: true, scores: true },
+      relations: {
+        players: true,
+        categories: true,
+        scores: true,
+      },
     });
 
     if (!event) {

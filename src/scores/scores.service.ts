@@ -12,6 +12,7 @@ import { Player } from 'src/players/entities/player.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Phase } from 'src/phases/entities/phase.entity';
 
 @Injectable()
 export class ScoresService {
@@ -22,6 +23,8 @@ export class ScoresService {
     @InjectRepository(Music) private musicRepository: Repository<Music>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    @InjectRepository(Phase)
+    private phaseRepository: Repository<Phase>
   ) {}
 
   async create(player_id: number, scoreDetails: CreateScoreParams) {
@@ -34,7 +37,7 @@ export class ScoresService {
       throw new NotFoundException('Player not found');
     }
 
-    const { event_id, music_id, category_id } = scoreDetails;
+    const { event_id, music_id, category_id, phase_id } = scoreDetails;
 
     const event = await this.eventRepository.findOne({
       where: { event_id: event_id },
@@ -61,9 +64,6 @@ export class ScoresService {
 
     const music = await this.musicRepository.findOne({
       where: { music_id: music_id },
-      relations: {
-        categories: true,
-      },
     });
 
     if (!music) {
@@ -91,12 +91,23 @@ export class ScoresService {
       );
     }
 
-    if (
-      music.categories.filter((c) => c.category_id == category_id).length === 0
-    ) {
-      throw new BadRequestException(
-        'This Music is not assigned to this Category in this Event',
-      );
+    // check if phase exists
+    const phase = await this.phaseRepository.findOne({
+      where: {
+        phase_id: phase_id
+      },
+      relations: {
+        musics: true
+      }
+    })
+
+    if (!phase) {
+      throw new NotFoundException('Phase not found')
+    }
+
+    //check if music is within phase: musics[]
+    if (phase.musics.filter((m) => m.music_id == music.music_id).length === 0) {
+      throw new BadRequestException('This Music is not assigned to this Phase')
     }
 
     const identicalScore = await this.scoreRepository.findOne({
@@ -105,12 +116,13 @@ export class ScoresService {
         event: event,
         category: category,
         music: music,
+        phase: phase
       },
     });
 
     if (identicalScore) {
       throw new BadRequestException(
-        'There can be only one instance of a Score created by a Player to a Music, inside a Category, inside of an Event',
+        'There can be only one instance of a Score created by a Player to a Music, inside a Category Phase of an Event',
       );
     }
 
@@ -125,6 +137,7 @@ export class ScoresService {
       event: event,
       music: music,
       category: category,
+      phase: phase
     });
 
     await this.scoreRepository.save(newScore);
@@ -136,6 +149,7 @@ export class ScoresService {
         event: true,
         category: true,
         music: true,
+        phase: true
       },
     });
   }

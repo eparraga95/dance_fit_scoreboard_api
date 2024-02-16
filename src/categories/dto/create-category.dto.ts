@@ -3,7 +3,7 @@ export class CreateCategoryDto {
   level_min: number;
   level_max: number;
   event_id: number;
-  music_ids?: number[];
+  number_of_phases: number;
 }
 
 export type CreateCategoryParams = {
@@ -11,5 +11,5 @@ export type CreateCategoryParams = {
   level_min: number;
   level_max: number;
   event_id: number;
-  music_ids?: number[];
+  number_of_phases: number;
 };

@@ -18,6 +18,12 @@ export class MusicsService {
   async create(createMusicDto: CreateMusicDto) {
     const { name, level, mode } = createMusicDto;
 
+    const modes = ['single', 'double'];
+
+    if (!modes.includes(mode)) {
+      throw new BadRequestException('Modes can only be single or double');
+    }
+
     const identicalMusic = await this.musicRepository.findOne({
       where: { name: name, level: level, mode: mode },
     });
@@ -35,14 +41,13 @@ export class MusicsService {
 
   async findAll() {
     return await this.musicRepository.find({
-      relations: { categories: { event: true } },
+      
     });
   }
 
   async findOne(id: number) {
     const music = await this.musicRepository.findOne({
       where: { music_id: id },
-      relations: { categories: { event: true }, scores: { player: true } },
     });
 
     if (!music) {

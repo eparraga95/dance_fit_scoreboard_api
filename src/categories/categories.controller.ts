@@ -1,4 +1,4 @@
-import { AddMusicDto } from './dto/add-music.dto';
+import { AddMusicDto } from '../phases/dto/add-music.dto';
 import {
   Controller,
   Get,
@@ -15,7 +15,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
-import { RemoveMusicDto } from './dto/remove-music.dto';
+import { RemoveMusicDto } from '../phases/dto/remove-music.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -52,21 +52,6 @@ export class CategoriesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
-  }
-
-  @UseGuards(AuthGuard, AdminGuard)
-  @Patch(':id/add')
-  addMusic(@Body() addMusicDto: AddMusicDto, @Param('id') category_id: number) {
-    return this.categoriesService.addMusic(category_id, addMusicDto);
-  }
-
-  @UseGuards(AuthGuard, AdminGuard)
-  @Patch(':id/remove')
-  removeMusic(
-    @Body() addMusicDto: RemoveMusicDto,
-    @Param('id') category_id: number,
-  ) {
-    return this.categoriesService.removeMusic(category_id, addMusicDto);
   }
 
   @UseGuards(AuthGuard)

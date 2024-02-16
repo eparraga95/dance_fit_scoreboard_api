@@ -40,7 +40,6 @@ export class PlayersService {
   }
 
   async findOne(id: number) {
-    
     const player = await this.playerRepository.findOne({
       where: { player_id: id },
       relations: {
@@ -78,6 +77,6 @@ export class PlayersService {
       throw new NotFoundException('Player not found');
     }
 
-    return this.playerRepository.delete(player);
+    return await this.playerRepository.delete({ player_id: id });
   }
 }

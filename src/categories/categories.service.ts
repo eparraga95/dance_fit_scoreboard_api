@@ -9,9 +9,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { Event } from 'src/events/entities/event.entity';
-import { AddMusicParams } from './dto/add-music.dto';
+import { AddMusicParams } from '../phases/dto/add-music.dto';
 import { Music } from 'src/musics/entities/music.entity';
-import { RemoveMusicParams } from './dto/remove-music.dto';
+import { RemoveMusicParams } from '../phases/dto/remove-music.dto';
 import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
-    const { event_id, name, level_max, level_min } = createCategoryDetails;
+    const { event_id, name, level_max, level_min, number_of_phases } = createCategoryDetails;
 
     const event = await this.eventRepository.findOneBy({ event_id: event_id });
 
@@ -38,86 +38,15 @@ export class CategoriesService {
       level_min: level_min,
       level_max: level_max,
       event: event,
+      number_of_phases: number_of_phases
     });
 
     return this.categoryRepository.save(newCategory);
   }
 
-  async addMusic(category_id: number, addMusicDetails: AddMusicParams) {
-    const category = await this.categoryRepository.findOne({
-      where: { category_id: category_id },
-      relations: {
-        musics: true,
-      },
-    });
-
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
-    const { music_id } = addMusicDetails;
-
-    const music = await this.musicRepository.findOne({
-      where: { music_id: music_id },
-    });
-
-    if (!music) {
-      throw new NotFoundException('Music not found');
-    }
-
-    if (music.level > category.level_max || music.level < category.level_min) {
-      throw new BadRequestException(
-        'This Music level is not in range with this Category accepted levels',
-      );
-    }
-
-    if (category.musics.filter((m) => m.music_id == music_id).length > 0) {
-      throw new BadRequestException('Music is already in this Category');
-    }
-
-    category.musics = [...category.musics, music];
-
-    return await this.categoryRepository.save(category);
-  }
-
-  async removeMusic(
-    category_id: number,
-    removeMusicDetails: RemoveMusicParams,
-  ) {
-    const category = await this.categoryRepository.findOne({
-      where: { category_id: category_id },
-      relations: {
-        musics: true,
-      },
-    });
-
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
-    const { music_id } = removeMusicDetails;
-
-    const music = await this.musicRepository.findOne({
-      where: { music_id: music_id },
-    });
-
-    if (!music) {
-      throw new NotFoundException('Music not found');
-    }
-
-    if (category.musics.filter((m) => m.music_id == music_id).length === 0) {
-      throw new BadRequestException('Music is not assigned to this Category');
-    }
-
-    category.musics = category.musics.filter((m) => m.music_id != music_id);
-
-    return await this.categoryRepository.save(category);
-  }
-
   async findAll() {
     return await this.categoryRepository.find({
       relations: {
-        musics: true,
         players: true,
       },
     });
@@ -127,7 +56,6 @@ export class CategoriesService {
     const category = await this.categoryRepository.findOne({
       where: { category_id: id },
       relations: {
-        musics: true,
         players: true,
       },
     });
@@ -148,9 +76,12 @@ export class CategoriesService {
       throw new NotFoundException('Category not found');
     }
 
-    return this.categoryRepository.update(category, {
-      ...updateCategoryDetails,
-    });
+    return await this.categoryRepository.update(
+      { category_id: id },
+      {
+        ...updateCategoryDetails,
+      },
+    );
   }
 
   async remove(id: number) {
@@ -211,8 +142,6 @@ export class CategoriesService {
     if (!category) {
       throw new NotFoundException('Category not found');
     }
-
-    console.log(category.players.filter((p) => p.player_id != player_id));
 
     if (category.players.filter((p) => p.player_id == player_id).length === 0) {
       throw new BadRequestException('Player is not assigned to this Category');

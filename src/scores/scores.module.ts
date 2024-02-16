@@ -10,10 +10,11 @@ import { Event } from 'src/events/entities/event.entity';
 import { Session } from 'src/auth/entities/session.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Phase } from 'src/phases/entities/phase.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Score, Player, Event, Session, Music, Category]),
+    TypeOrmModule.forFeature([Score, Player, Event, Session, Music, Category, Phase]),
     AuthModule,
     JwtModule,
   ],

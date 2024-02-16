@@ -1,5 +1,5 @@
 import { Event } from 'src/events/entities/event.entity';
-import { Music } from 'src/musics/entities/music.entity';
+import { Phase } from 'src/phases/entities/phase.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Score } from 'src/scores/entities/score.entity';
 import {
@@ -29,10 +29,6 @@ export class Category {
   @Column()
   level_max: number;
 
-  @ManyToMany(() => Music, (music) => music.categories)
-  @JoinTable()
-  musics: Music[];
-
   @OneToMany(() => Score, (score) => score.category)
   @JoinColumn()
   scores: Score[];
@@ -43,4 +39,10 @@ export class Category {
   @ManyToMany(() => Player, (player) => player.categories)
   @JoinTable()
   players: Player[]
+
+  @Column()
+  number_of_phases: number
+
+  @OneToMany(() => Phase, (phase) => phase.category)
+  phases: Phase[]
 }
