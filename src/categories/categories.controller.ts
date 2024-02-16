@@ -54,20 +54,20 @@ export class CategoriesController {
     return this.categoriesService.remove(+id);
   }
 
-  @UseGuards(AuthGuard, AdminGuard)
-  @Patch(':id/add')
-  addMusic(@Body() addMusicDto: AddMusicDto, @Param('id') category_id: number) {
-    return this.categoriesService.addMusic(category_id, addMusicDto);
-  }
+  // @UseGuards(AuthGuard, AdminGuard)
+  // @Patch(':id/add')
+  // addMusic(@Body() addMusicDto: AddMusicDto, @Param('id') category_id: number) {
+  //   return this.categoriesService.addMusic(category_id, addMusicDto);
+  // }
 
-  @UseGuards(AuthGuard, AdminGuard)
-  @Patch(':id/remove')
-  removeMusic(
-    @Body() addMusicDto: RemoveMusicDto,
-    @Param('id') category_id: number,
-  ) {
-    return this.categoriesService.removeMusic(category_id, addMusicDto);
-  }
+  // @UseGuards(AuthGuard, AdminGuard)
+  // @Patch(':id/remove')
+  // removeMusic(
+  //   @Body() addMusicDto: RemoveMusicDto,
+  //   @Param('id') category_id: number,
+  // ) {
+  //   return this.categoriesService.removeMusic(category_id, addMusicDto);
+  // }
 
   @UseGuards(AuthGuard)
   @Patch(':id/join')

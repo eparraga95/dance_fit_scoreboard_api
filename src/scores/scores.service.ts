@@ -61,9 +61,6 @@ export class ScoresService {
 
     const music = await this.musicRepository.findOne({
       where: { music_id: music_id },
-      relations: {
-        categories: true,
-      },
     });
 
     if (!music) {
@@ -88,14 +85,6 @@ export class ScoresService {
     ) {
       throw new BadRequestException(
         'Player is not assigned to this Category in this Event',
-      );
-    }
-
-    if (
-      music.categories.filter((c) => c.category_id == category_id).length === 0
-    ) {
-      throw new BadRequestException(
-        'This Music is not assigned to this Category in this Event',
       );
     }
 

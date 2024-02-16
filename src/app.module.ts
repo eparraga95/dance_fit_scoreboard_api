@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { dataSourceOptions } from 'db/data-source';
 import { MusicsModule } from './musics/musics.module';
 import { CategoriesModule } from './categories/categories.module';
+import { PhasesModule } from './phases/phases.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     MusicsModule,
     CategoriesModule,
+    PhasesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

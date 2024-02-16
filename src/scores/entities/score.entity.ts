@@ -1,6 +1,7 @@
 import { Category } from 'src/categories/entities/category.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
+import { Phase } from 'src/phases/entities/phase.entity';
 import { Player } from 'src/players/entities/player.entity';
 import {
   Column,
@@ -44,4 +45,7 @@ export class Score {
 
   @ManyToOne(() => Music, (music) => music.scores)
   music: Music;
+
+  @ManyToOne(() => Phase, (phase) => phase.scores)
+  phase: Phase
 }
