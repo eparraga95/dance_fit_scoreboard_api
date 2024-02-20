@@ -9,6 +9,7 @@ import { LocalStrategy } from './local.auth';
 import { PlayersService } from 'src/players/players.service';
 import { ConfigModule } from '@nestjs/config';
 import { Session } from './entities/session.entity';
+import { S3Service } from 'src/aws/s3.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { Session } from './entities/session.entity';
     JwtModule,
     ConfigModule,
   ],
-  providers: [AuthService, LocalStrategy, PlayersService],
+  providers: [AuthService, LocalStrategy, PlayersService, S3Service],
   controllers: [AuthController],
 })
 export class AuthModule {}

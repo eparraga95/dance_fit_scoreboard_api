@@ -8,11 +8,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './entities/player.entity';
 import { Repository } from 'typeorm';
 import { CreatePlayerParams } from './dto/create-player.dto';
+import { S3Service } from 'src/aws/s3.service';
 
 @Injectable()
 export class PlayersService {
   constructor(
     @InjectRepository(Player) private playerRepository: Repository<Player>,
+    private readonly s3Service: S3Service
   ) {}
 
   async create(playerDetails: CreatePlayerParams) {
@@ -31,12 +33,18 @@ export class PlayersService {
   }
 
   async findAll() {
-    return await this.playerRepository.find({
+    const players = await this.playerRepository.find({
       relations: {
         scores: { category: true, music: true, event: true },
         events: true,
       },
     });
+
+    const safePlayers = players.map(
+      ({ password, ...rest }) => rest,
+    );
+
+    return safePlayers;
   }
 
   async findOne(id: number) {
@@ -52,7 +60,9 @@ export class PlayersService {
       throw new NotFoundException('Player not found');
     }
 
-    return player;
+    const { password, ...safePlayer} = player
+
+    return safePlayer;
   }
 
   async update(id: number, updatePlayerDetails: UpdatePlayerParams) {
@@ -78,5 +88,29 @@ export class PlayersService {
     }
 
     return await this.playerRepository.delete({ player_id: id });
+  }
+
+  async uploadProfilePicture(player_id: number, imageBuffer: Buffer, mimeType: string) {
+    const player = await this.playerRepository.findOne({
+      where: {
+        player_id: player_id,
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+    
+    const fileName = player.nickname + 'profilepic'
+
+    await this.s3Service.uploadFile('dancefitscoreboardbucket', fileName, imageBuffer, mimeType)
+    
+    const profilePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`
+
+    player.profilePicture = profilePictureURL
+
+    await this.playerRepository.save(player)
+
+    return { message: 'Profile picture uploaded successfully' };
   }
 }

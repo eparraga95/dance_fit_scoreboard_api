@@ -22,6 +22,9 @@ export class Player {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  profilePicture: string;
+
   @Column()
   role: string;
 
@@ -32,5 +35,5 @@ export class Player {
   events: Event[];
 
   @ManyToMany(() => Category, (category) => category.players)
-  categories: Category[]
+  categories: Category[];
 }

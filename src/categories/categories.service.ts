@@ -9,9 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { Event } from 'src/events/entities/event.entity';
-import { AddMusicParams } from '../phases/dto/add-music.dto';
 import { Music } from 'src/musics/entities/music.entity';
-import { RemoveMusicParams } from '../phases/dto/remove-music.dto';
 import { Player } from 'src/players/entities/player.entity';
 
 @Injectable()
@@ -48,6 +46,7 @@ export class CategoriesService {
     return await this.categoryRepository.find({
       relations: {
         players: true,
+        phases: true,
       },
     });
   }
@@ -57,6 +56,7 @@ export class CategoriesService {
       where: { category_id: id },
       relations: {
         players: true,
+        phases: true,
       },
     });
 
