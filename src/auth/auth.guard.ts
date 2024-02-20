@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from './entities/session.entity';
 import { Repository } from 'typeorm';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,7 +18,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
     const requestToken: string = request.headers.authorization.split(' ')[1];
 
     if (!requestToken) {
@@ -44,7 +45,7 @@ export class AuthGuard implements CanActivate {
 
     request.user = this.jwtService.verify(session.token, {
       secret: process.env.jwtSecret,
-    });
+    })
 
     return true;
   }

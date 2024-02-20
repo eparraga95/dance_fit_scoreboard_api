@@ -31,6 +31,7 @@ The idea is to make it possible so a player can send a picture of their scores a
 | GET    | /players/:id    | Find By Id    | Bearer Token, roles: 'admin', 'player' | Query for a Player by its player_id                                                       |
 | PATCH  | /players/:id    | Update        | Bearer Token, roles: 'admin' | Updates the Player's updatable data                                                       |
 | DELETE | /players/:id    | Delete        | Bearer Token, roles: 'admin'                   | Deletes a Player instance                                                                 |
+| POST   | /players/profile-picture | Upload Profile Picture | Bearer Token, roles: 'admin', 'player'                                        | Uploads the Player profile picture to an AWS S3 Bucket and stores its reference in the DB |
 
 ### Auth
 ---
