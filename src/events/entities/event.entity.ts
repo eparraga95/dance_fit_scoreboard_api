@@ -23,13 +23,13 @@ export class Event {
   @Column({ default: true })
   status: boolean;
 
-  @ManyToMany(() => Player, (player) => player.events)
+  @ManyToMany(() => Player, (player) => player.events, { onDelete: 'CASCADE'})
   @JoinTable()
   players: Player[];
 
-  @OneToMany(() => Score, (score) => score.event)
+  @OneToMany(() => Score, (score) => score.event, { onDelete: 'CASCADE'})
   scores: Score[];
 
-  @OneToMany(() => Category, (category) => category.event)
+  @OneToMany(() => Category, (category) => category.event, { onDelete: 'CASCADE'})
   categories: Category[];
 }

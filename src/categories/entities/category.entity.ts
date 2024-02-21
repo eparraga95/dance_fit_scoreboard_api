@@ -13,7 +13,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({ name: 'categories' })
+@Entity({ name: 'categories'})
 export class Category {
   @PrimaryGeneratedColumn({
     type: 'bigint',
@@ -29,20 +29,20 @@ export class Category {
   @Column()
   level_max: number;
 
-  @OneToMany(() => Score, (score) => score.category)
+  @OneToMany(() => Score, (score) => score.category, { onDelete: 'CASCADE'})
   @JoinColumn()
   scores: Score[];
 
   @ManyToOne(() => Event, (event) => event.categories)
   event: Event;
 
-  @ManyToMany(() => Player, (player) => player.categories)
+  @ManyToMany(() => Player, (player) => player.categories, { onDelete: 'CASCADE'})
   @JoinTable()
   players: Player[]
 
   @Column()
   number_of_phases: number
 
-  @OneToMany(() => Phase, (phase) => phase.category)
+  @OneToMany(() => Phase, (phase) => phase.category, { onDelete: 'CASCADE'})
   phases: Phase[]
 }
