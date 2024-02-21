@@ -50,7 +50,6 @@ export class PhasesService {
     }
 
     // check if same phase: phase_number already exists
-    console.log(category.phases.filter((ph) => ph.phase_number == phase_number))
     if (category.phases.filter((ph) => ph.phase_number === phase_number).length > 0) {
       throw new BadRequestException('A Phase with this Phase number already exists')
     }
