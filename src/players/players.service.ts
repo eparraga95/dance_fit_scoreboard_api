@@ -14,7 +14,7 @@ import { S3Service } from 'src/aws/s3.service';
 export class PlayersService {
   constructor(
     @InjectRepository(Player) private playerRepository: Repository<Player>,
-    private readonly s3Service: S3Service
+    private readonly s3Service: S3Service,
   ) {}
 
   async create(playerDetails: CreatePlayerParams) {
@@ -40,9 +40,7 @@ export class PlayersService {
       },
     });
 
-    const safePlayers = players.map(
-      ({ password, ...rest }) => rest,
-    );
+    const safePlayers = players.map(({ password, ...rest }) => rest);
 
     return safePlayers;
   }
@@ -60,7 +58,7 @@ export class PlayersService {
       throw new NotFoundException('Player not found');
     }
 
-    const { password, ...safePlayer} = player
+    const { password, ...safePlayer } = player;
 
     return safePlayer;
   }
@@ -90,7 +88,11 @@ export class PlayersService {
     return await this.playerRepository.delete({ player_id: id });
   }
 
-  async uploadProfilePicture(player_id: number, imageBuffer: Buffer, mimeType: string) {
+  async uploadProfilePicture(
+    player_id: number,
+    imageBuffer: Buffer,
+    mimeType: string,
+  ) {
     const player = await this.playerRepository.findOne({
       where: {
         player_id: player_id,
@@ -100,16 +102,25 @@ export class PlayersService {
     if (!player) {
       throw new NotFoundException('Player not found');
     }
-    
-    const fileName = player.nickname + 'profilepic'
 
-    await this.s3Service.uploadFile('dancefitscoreboardbucket', fileName, imageBuffer, mimeType)
-    
-    const profilePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`
+    const fileName = player.nickname + 'profilepic';
 
-    player.profilePicture = profilePictureURL
+    try {
+      await this.s3Service.uploadFile(
+        'dancefitscoreboardbucket',
+        fileName,
+        imageBuffer,
+        mimeType,
+      );
+    } catch (err) {
+      console.log(err);
+    }
 
-    await this.playerRepository.save(player)
+    const profilePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`;
+
+    player.profilePicture = profilePictureURL;
+
+    await this.playerRepository.save(player);
 
     return { message: 'Profile picture uploaded successfully' };
   }

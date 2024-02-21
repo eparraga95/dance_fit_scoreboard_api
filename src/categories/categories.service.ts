@@ -23,7 +23,8 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
-    const { event_id, name, level_max, level_min, number_of_phases } = createCategoryDetails;
+    const { event_id, name, level_max, level_min, number_of_phases } =
+      createCategoryDetails;
 
     const event = await this.eventRepository.findOneBy({ event_id: event_id });
 
@@ -36,7 +37,7 @@ export class CategoriesService {
       level_min: level_min,
       level_max: level_max,
       event: event,
-      number_of_phases: number_of_phases
+      number_of_phases: number_of_phases,
     });
 
     return this.categoryRepository.save(newCategory);
@@ -56,7 +57,8 @@ export class CategoriesService {
       where: { category_id: id },
       relations: {
         players: true,
-        phases: true,
+        phases: { musics: { scores: { player: true } } },
+        event: true,
       },
     });
 
