@@ -26,10 +26,10 @@ export class Music {
   @Column()
   mode: string;
 
-  @OneToMany(() => Score, (score) => score.music)
+  @OneToMany(() => Score, (score) => score.music, { onDelete: 'CASCADE'})
   @JoinColumn()
   scores: Score[];
 
-  @ManyToMany(() => Phase, (phase) => phase.musics)
+  @ManyToMany(() => Phase, (phase) => phase.musics, { onDelete: 'CASCADE'})
   phases: Phase[]
 }

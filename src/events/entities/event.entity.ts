@@ -4,7 +4,6 @@ import { Score } from 'src/scores/entities/score.entity';
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -23,13 +22,12 @@ export class Event {
   @Column({ default: true })
   status: boolean;
 
-  @ManyToMany(() => Player, (player) => player.events)
-  @JoinTable()
+  @ManyToMany(() => Player, (player) => player.events, { onDelete: 'CASCADE'})
   players: Player[];
 
   @OneToMany(() => Score, (score) => score.event)
   scores: Score[];
 
-  @OneToMany(() => Category, (category) => category.event)
+  @OneToMany(() => Category, (category) => category.event, { onDelete: 'CASCADE'})
   categories: Category[];
 }

@@ -22,53 +22,72 @@ export class AuthService {
   ) {}
 
   async validatePlayer(loginDetails: loginParams) {
-    const { nickname, password } = loginDetails;
+    try {
+      const { nickname, password } = loginDetails;
 
-    const player = await this.playerRepository.findOneBy({
-      nickname: nickname,
-    });
+      const player = await this.playerRepository.findOne({
+        where: {
+          nickname: nickname,
+        },
+        relations: {
+          session: true,
+        },
+      });
 
-    if (!player)
-      throw new NotFoundException('Player nickname/password incorrect');
+      if (!player)
+        throw new NotFoundException('Player nickname/password incorrect');
 
-    if (player.password === password) {
-      return await this.createSession(player);
+      if (player.password === password) {
+        return await this.createSession(player);
+      }
+
+      throw new UnauthorizedException('Player nickname/password incorrect');
+    } catch (error) {
+      console.error('Error logging in:', error);
+      throw error;
     }
-
-    throw new UnauthorizedException('Player nickname/password incorrect');
   }
 
   async createSession(player: Player) {
-    const existingSession = await this.sessionRepository.findOneBy({
-      player: player,
-    });
 
-    if (existingSession) {
-      await this.sessionRepository.delete(existingSession);
+    console.log(player)
+    try {
+      const existingSession = await this.sessionRepository.findOne({
+        where: {
+          session_id: player.session?.session_id,
+        },
+      });
+
+      if (existingSession) {
+        await this.sessionRepository.delete(existingSession);
+      }
+
+      const newSessionData = {
+        token: this.jwtService.sign(
+          {
+            nickname: player.nickname,
+            player_id: player.player_id,
+            role: player.role,
+          },
+          {
+            secret: process.env.jwtSecret,
+            expiresIn: '1h',
+          },
+        ),
+        player: player,
+      };
+
+      const newSession = this.sessionRepository.create(newSessionData);
+
+      await this.sessionRepository.save(newSession);
+
+      return {
+        access_token: newSessionData.token,
+      };
+    } catch (error) {
+      console.error('Error creating session:', error);
+      throw error;
     }
-
-    const newSessionData = {
-      token: this.jwtService.sign(
-        {
-          nickname: player.nickname,
-          player_id: player.player_id,
-          role: player.role,
-        },
-        {
-          secret: process.env.jwtSecret,
-          expiresIn: '1h',
-        },
-      ),
-      player: player,
-    };
-
-    const newSession = this.sessionRepository.create(newSessionData);
-
-    await this.sessionRepository.save(newSession);
-
-    return {
-      access_token: newSessionData.token,
-    };
   }
 
   async removeSession() {

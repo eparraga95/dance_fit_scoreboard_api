@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateMusicDto } from './dto/create-music.dto';
@@ -16,33 +17,33 @@ export class MusicsService {
   ) {}
 
   async create(createMusicDto: CreateMusicDto) {
-    const { name, level, mode } = createMusicDto;
+    try {
+      const { name, level, mode } = createMusicDto;
 
-    const modes = ['single', 'double'];
+      const modes = ['single', 'double'];
+      if (!modes.includes(mode)) {
+        throw new BadRequestException('Modes can only be single or double');
+      }
 
-    if (!modes.includes(mode)) {
-      throw new BadRequestException('Modes can only be single or double');
+      const identicalMusic = await this.musicRepository.findOne({
+        where: { name: name, level: level, mode: mode },
+      });
+      if (identicalMusic) {
+        throw new BadRequestException(
+          'Music with exact same data already exists',
+        );
+      }
+
+      const newMusic = this.musicRepository.create({ ...createMusicDto });
+      return await this.musicRepository.save(newMusic);
+    } catch (error) {
+      console.error('Error creating music:', error);
+      throw error;
     }
-
-    const identicalMusic = await this.musicRepository.findOne({
-      where: { name: name, level: level, mode: mode },
-    });
-
-    if (identicalMusic) {
-      throw new BadRequestException(
-        'Music with exact same data already exists',
-      );
-    }
-
-    const newMusic = this.musicRepository.create({ ...createMusicDto });
-
-    return await this.musicRepository.save(newMusic);
   }
 
   async findAll() {
-    return await this.musicRepository.find({
-      
-    });
+    return await this.musicRepository.find();
   }
 
   async findOne(id: number) {
@@ -57,32 +58,58 @@ export class MusicsService {
     return music;
   }
 
-  async update(id: number, updateMusicDto: UpdateMusicDto) {
-    const music = await this.musicRepository.findOne({
-      where: { music_id: id },
-    });
+  async update(music_id: number, updateMusicDto: UpdateMusicDto) {
+    try {
+      const music = await this.musicRepository.findOne({
+        where: { music_id: music_id },
+      });
 
-    if (!music) {
-      throw new NotFoundException('Music not found');
+      if (!music) {
+        throw new NotFoundException('Music not found');
+      }
+
+      const updateResult = await this.musicRepository.update(
+        {
+          music_id: music_id,
+        },
+        { ...updateMusicDto },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to update music');
+      }
+
+      return await this.musicRepository.findOne({
+        where: { music_id: music_id },
+      });
+    } catch (error) {
+      console.error('Error updating music:', error);
+      throw error;
     }
-
-    return await this.musicRepository.update(
-      {
-        music_id: id,
-      },
-      { ...updateMusicDto },
-    );
   }
 
-  async remove(id: number) {
-    const music = await this.musicRepository.findOne({
-      where: { music_id: id },
-    });
+  async remove(music_id: number) {
+    try {
+      const music = await this.musicRepository.findOne({
+        where: { music_id: music_id },
+      });
 
-    if (!music) {
-      throw new NotFoundException('Music not found');
+      if (!music) {
+        throw new NotFoundException('Music not found');
+      }
+
+      const deletionResult = await this.musicRepository.delete({
+        music_id: music_id,
+      });
+
+      if (deletionResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to delete music');
+      }
+
+      return { message: 'Music deleted successfully' };
+    } catch (error) {
+      console.error('Error deleting music:', error);
+      throw error;
     }
-
-    return await this.musicRepository.delete({ music_id: id });
   }
 }

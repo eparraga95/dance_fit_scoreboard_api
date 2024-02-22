@@ -1,13 +1,17 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Session } from 'src/auth/entities/session.entity';
 
 @Entity({ name: 'players' })
 export class Player {
@@ -28,12 +32,18 @@ export class Player {
   @Column()
   role: string;
 
-  @OneToMany(() => Score, (score) => score.player)
+  @OneToMany(() => Score, (score) => score.player, { onDelete: 'CASCADE' })
   scores: Score[];
 
   @ManyToMany(() => Event, (event) => event.players)
+  @JoinTable()
   events: Event[];
 
-  @ManyToMany(() => Category, (category) => category.players)
+  @ManyToMany(() => Category, (category) => category.players, { cascade: true })
+  @JoinTable()
   categories: Category[];
+
+  @OneToOne(() => Player, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  session: Session;
 }
