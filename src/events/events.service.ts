@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventParams } from './dto/create-event.dto';
@@ -18,48 +19,95 @@ export class EventsService {
   ) {}
 
   async create(createEventDetails: CreateEventParams) {
-    const { name } = createEventDetails;
+    try {
+      const { name } = createEventDetails;
 
-    const sameNameEvent = await this.eventRepository.findOne({
-      where: { name: name },
-    });
+      if (!name) {
+        throw new BadRequestException('Invalid event details');
+      }
 
-    if (sameNameEvent) {
-      throw new BadRequestException('Same name Event already exists');
+      const sameNameEvent = await this.eventRepository.findOne({
+        where: { name },
+      });
+      if (sameNameEvent) {
+        throw new BadRequestException(
+          'An event with the same name already exists',
+        );
+      }
+
+      const newEvent = this.eventRepository.create(createEventDetails);
+
+      return await this.eventRepository.save(newEvent);
+    } catch (error) {
+      console.error('Error creating event:', error);
+      throw error;
     }
-
-    const newEvent = this.eventRepository.create({ ...createEventDetails });
-
-    return await this.eventRepository.save(newEvent);
   }
 
   async addPlayer(player_id: number, event_id: number) {
-    const player = await this.playerRepository.findOneBy({
-      player_id: player_id,
-    });
-
-    if (!player) throw new NotFoundException('Player not found');
-
-    const event = await this.eventRepository.findOne({
-      where: {
-        event_id: event_id
-      },
-      relations: {
-        players: true
+    try {
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+      if (!player) {
+        throw new NotFoundException('Player not found');
       }
-    })
 
-    if (!event) throw new NotFoundException('Event not found');
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+        relations: { players: true },
+      });
 
-    if (
-      event.players.filter((pl) => pl.nickname === player.nickname).length > 0
-    ) {
-      throw new BadRequestException('Player already in Event');
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const playerExists = event.players.some((p) => p.player_id === player_id);
+      if (playerExists) {
+        throw new BadRequestException('Player already assigned to this event');
+      }
+
+      event.players.push(player);
+
+      return await this.eventRepository.save(event);
+    } catch (error) {
+      console.error('Error adding player to the event:', error);
+      throw error;
     }
+  }
 
-    event.players = [...event.players, player];
+  async removePlayer(player_id: number, event_id: number) {
+    try {
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
 
-    return await this.eventRepository.save(event);
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+        relations: { players: true },
+      });
+
+      const playerIndex = event.players.findIndex(
+        (p) => p.player_id === player_id,
+      );
+      if (playerIndex === -1) {
+        throw new BadRequestException('Player not assigned to this event');
+      }
+
+      event.players.splice(playerIndex, 1);
+
+      return await this.eventRepository.save(event);
+    } catch (error) {
+      console.error('Error removing player from event:', error);
+      throw error;
+    }
   }
 
   async findAll() {
@@ -89,29 +137,57 @@ export class EventsService {
   }
 
   async update(id: number, updateEventDetails: UpdateEventParams) {
-    const event = await this.eventRepository.findOne({
-      where: { event_id: id },
-    });
+    try {
+      const event = await this.eventRepository.findOne({
+        where: { event_id: id },
+      });
 
-    if (!event) {
-      throw new NotFoundException('Event not found');
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const updateResult = await this.eventRepository.update(
+        { event_id: id },
+        { ...updateEventDetails },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to update event');
+      }
+
+      return await this.eventRepository.findOne({
+        where: {
+          event_id: id,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating event:', error);
+      throw error;
     }
-
-    return this.eventRepository.update(
-      { event_id: id },
-      { ...updateEventDetails },
-    );
   }
 
   async remove(id: number) {
-    const event = await this.eventRepository.findOne({
-      where: { event_id: id },
-    });
+    try {
+      const event = await this.eventRepository.findOne({
+        where: { event_id: id },
+      });
 
-    if (!event) {
-      throw new NotFoundException('Event not found');
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const deletionResult = await this.eventRepository.delete({
+        event_id: id,
+      });
+
+      if (deletionResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to delete event');
+      }
+
+      return { message: 'Event deleted successfully' };
+    } catch (error) {
+      console.error('Error deleting an event:', error);
+      throw error;
     }
-
-    return this.eventRepository.delete({ event_id: id });
   }
 }

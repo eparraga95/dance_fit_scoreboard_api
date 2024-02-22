@@ -64,7 +64,8 @@ The idea is to make it possible so a player can send a picture of their scores a
 | GET    | /events/:id | Find By Id | Bearer Token, roles: 'player', 'admin'                                      | Query for an Event by its score_id                                       |
 | PATCH  | /events/:id | Update     | Bearer Token, roles: 'admin' | Updates the Event's updatable data                                      |
 | DELETE | /events/:id | Delete     | Bearer Token, roles: 'admin'                   | Deletes an Event instance                                               |
-| POST   | /events/:id/join | Join Event | Bearer Token, roles: 'admin', 'player' | Enrolls a Player instance to an Event instance |
+| PATCH   | /events/:id/join | Join Event | Bearer Token, roles: 'admin', 'player' | Enrolls the logged in Player instance to an Event instance |
+| PATCH   | /events/:id/leave | Leave Event | Bearer Token, roles: 'admin', 'player' | Detach the logged in Player instance from an Event instance |
 
 
 ### Musics

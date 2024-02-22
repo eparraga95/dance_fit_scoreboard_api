@@ -16,8 +16,4 @@ export class Session {
 
   @Column()
   token: string;
-
-  @OneToOne(() => Player)
-  @JoinColumn()
-  player: Player;
 }

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCategoryParams } from './dto/create-category.dto';
@@ -23,24 +24,36 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDetails: CreateCategoryParams) {
-    const { event_id, name, level_max, level_min, number_of_phases } =
-      createCategoryDetails;
+    try {
+      const { event_id, name, level_max, level_min, number_of_phases } =
+        createCategoryDetails;
 
-    const event = await this.eventRepository.findOneBy({ event_id: event_id });
+      if (!event_id || !name || !level_min || !level_max || !number_of_phases) {
+        throw new BadRequestException('Invalid category details');
+      }
 
-    if (!event) {
-      throw new NotFoundException('Event not found');
+      const event = await this.eventRepository.findOne({
+        where: { event_id: event_id },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const newCategory = this.categoryRepository.create({
+        name: name,
+        level_min: level_min,
+        level_max: level_max,
+        event: event,
+        number_of_phases: number_of_phases,
+      });
+
+      const savedCategory = await this.categoryRepository.save(newCategory);
+      return savedCategory;
+    } catch (error) {
+      console.error('Error creating category:', error);
+      throw error;
     }
-
-    const newCategory = this.categoryRepository.create({
-      name: name,
-      level_min: level_min,
-      level_max: level_max,
-      event: event,
-      number_of_phases: number_of_phases,
-    });
-
-    return this.categoryRepository.save(newCategory);
   }
 
   async findAll() {
@@ -70,99 +83,133 @@ export class CategoriesService {
   }
 
   async update(id: number, updateCategoryDetails: UpdateCategoryParams) {
-    const category = await this.categoryRepository.findOne({
-      where: { category_id: id },
-    });
+    try {
+      const category = await this.categoryRepository.findOne({
+        where: { category_id: id },
+      });
 
-    if (!category) {
-      throw new NotFoundException('Category not found');
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const updateResult = await this.categoryRepository.update(
+        { category_id: id },
+        {
+          ...updateCategoryDetails,
+        },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to update category');
+      }
+
+      return { message: 'Category updated successfully' };
+    } catch (error) {
+      console.error('Error updating category:', error);
+      throw error;
     }
-
-    return await this.categoryRepository.update(
-      { category_id: id },
-      {
-        ...updateCategoryDetails,
-      },
-    );
   }
 
   async remove(id: number) {
-    const category = await this.categoryRepository.findOne({
-      where: { category_id: id },
-    });
+    try {
+      const category = await this.categoryRepository.findOne({
+        where: { category_id: id },
+      });
 
-    if (!category) {
-      throw new NotFoundException('Category not found');
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const deletionResult = await this.categoryRepository.delete({
+        category_id: id,
+      });
+
+      if (deletionResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to delete Category');
+      }
+
+      return { message: 'Category deleted successfully' };
+    } catch (error) {
+      console.error('Error deleting category');
+      throw error;
     }
-
-    return this.categoryRepository.delete({ category_id: id });
   }
 
   async addPlayer(player_id: number, category_id: number) {
-    const category = await this.categoryRepository.findOne({
-      where: {
-        category_id: category_id,
-      },
-      relations: {
-        players: true,
-      },
-    });
+    try {
+      const category = await this.categoryRepository.findOne({
+        where: {
+          category_id: category_id,
+        },
+        relations: ['players'],
+      });
 
-    if (!category) {
-      throw new NotFoundException('Category not found');
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const playerExists = category.players.some(
+        (player) => player.player_id === player_id,
+      );
+      if (playerExists) {
+        throw new BadRequestException(
+          'Player already assigned to this Category',
+        );
+      }
+
+      const player = await this.playerRepository.findOne({
+        where: {
+          player_id: player_id,
+        },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      category.players.push(player);
+
+      await this.categoryRepository.save(category);
+      return {
+        message: 'Player added to category successfully',
+      };
+    } catch (error) {
+      console.error('Error adding player to category:', error);
+      throw error;
     }
-
-    if (category.players.filter((p) => p.player_id === player_id).length > 0) {
-      throw new BadRequestException('Player already assigned to this Category');
-    }
-
-    const player = await this.playerRepository.findOne({
-      where: {
-        player_id: player_id,
-      },
-    });
-
-    if (!player) {
-      throw new NotFoundException('Player not found');
-    }
-
-    category.players = [...category.players, player];
-
-    return await this.categoryRepository.save(category);
   }
 
   async removePlayer(player_id: number, category_id: number) {
-    const category = await this.categoryRepository.findOne({
-      where: {
-        category_id: category_id,
-      },
-      relations: {
-        players: true,
-      },
-    });
+    try {
+      const category = await this.categoryRepository.findOne({
+        where: {
+          category_id: category_id,
+        },
+        relations: ['players'],
+      });
 
-    if (!category) {
-      throw new NotFoundException('Category not found');
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const playerIndex = category.players.findIndex(
+        (player) => player.player_id === player_id,
+      );
+      if (playerIndex === -1) {
+        throw new BadRequestException(
+          'Player is not assigned to this Category',
+        );
+      }
+
+      category.players.splice(playerIndex, 1);
+
+      await this.categoryRepository.save(category);
+      return {
+        message: 'Player removed from category successfully',
+      };
+    } catch (error) {
+      console.error('Error removing player from category:', error);
+      throw error;
     }
-
-    if (category.players.filter((p) => p.player_id == player_id).length === 0) {
-      throw new BadRequestException('Player is not assigned to this Category');
-    }
-
-    const player = await this.playerRepository.findOne({
-      where: {
-        player_id: player_id,
-      },
-    });
-
-    if (!player) {
-      throw new NotFoundException('Player not found');
-    }
-
-    category.players = category.players.filter(
-      (p) => p.player_id != player.player_id,
-    );
-
-    return await this.categoryRepository.save(category);
   }
 }

@@ -34,6 +34,14 @@ export class EventsController {
   }
 
   @UseGuards(AuthGuard)
+  @Patch('/:id/leave')
+  removePlayer(@Req() { user}, @Param('id') event_id: number) {
+    const { player_id } = user
+
+    return this.eventsService.removePlayer(player_id, event_id)
+  }
+
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.eventsService.findAll();

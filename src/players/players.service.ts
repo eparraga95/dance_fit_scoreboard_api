@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdatePlayerParams } from './dto/update-player.dto';
@@ -18,36 +19,36 @@ export class PlayersService {
   ) {}
 
   async create(playerDetails: CreatePlayerParams) {
-    const { password, confirmPassword } = playerDetails;
+    try {
+      const { password, confirmPassword } = playerDetails;
 
-    if (password != confirmPassword) {
-      throw new BadRequestException('Passwords must match');
+      if (password != confirmPassword) {
+        throw new BadRequestException('Passwords must match');
+      }
+
+      const newPlayer = this.playerRepository.create({
+        ...playerDetails,
+        role: 'player',
+      });
+
+      return await this.playerRepository.save(newPlayer);
+    } catch (error) {
+      console.error('Error creating player:', error);
+      throw error;
     }
-
-    const newPlayer = this.playerRepository.create({
-      ...playerDetails,
-      role: 'player',
-    });
-
-    return await this.playerRepository.save(newPlayer);
   }
 
   async findAll() {
-    const players = await this.playerRepository.find({
-      relations: {
-        scores: { category: true, music: true, event: true },
-        events: true,
-      },
-    });
+    const players = await this.playerRepository.find();
 
     const safePlayers = players.map(({ password, ...rest }) => rest);
 
     return safePlayers;
   }
 
-  async findOne(id: number) {
+  async findOne(player_id: number) {
     const player = await this.playerRepository.findOne({
-      where: { player_id: id },
+      where: { player_id: player_id },
       relations: {
         scores: { category: true, music: true, event: true },
         events: true,
@@ -63,29 +64,59 @@ export class PlayersService {
     return safePlayer;
   }
 
-  async update(id: number, updatePlayerDetails: UpdatePlayerParams) {
-    const player = this.playerRepository.findOne({ where: { player_id: id } });
+  async update(player_id: number, updatePlayerDetails: UpdatePlayerParams) {
+    try {
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
 
-    if (!player) {
-      throw new NotFoundException('Player not found');
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const updateResult = await this.playerRepository.update(
+        { player_id: player_id },
+        { ...updatePlayerDetails },
+      );
+
+      if (updateResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to update player');
+      }
+
+      return await this.playerRepository.findOne({
+        where: {
+          player_id: player_id,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating player:', error);
+      throw error;
     }
-
-    return await this.playerRepository.update(
-      { player_id: id },
-      { ...updatePlayerDetails },
-    );
   }
 
   async remove(id: number) {
-    const player = await this.playerRepository.findOne({
-      where: { player_id: id },
-    });
+    try {
+      const player = await this.playerRepository.findOne({
+        where: { player_id: id },
+      });
 
-    if (!player) {
-      throw new NotFoundException('Player not found');
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const deletionResult = await this.playerRepository.delete({
+        player_id: id,
+      });
+
+      if (deletionResult.affected === 0) {
+        throw new InternalServerErrorException('Failed to delete player');
+      }
+
+      return { message: 'Player deleted succesfully' };
+    } catch (error) {
+      console.error('Error deleting player:', error);
+      throw error;
     }
-
-    return await this.playerRepository.delete({ player_id: id });
   }
 
   async uploadProfilePicture(
@@ -93,35 +124,42 @@ export class PlayersService {
     imageBuffer: Buffer,
     mimeType: string,
   ) {
-    const player = await this.playerRepository.findOne({
-      where: {
-        player_id: player_id,
-      },
-    });
-
-    if (!player) {
-      throw new NotFoundException('Player not found');
-    }
-
-    const fileName = player.nickname + 'profilepic';
-
     try {
+      const player = await this.playerRepository.findOne({
+        where: {
+          player_id: player_id,
+        },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      if (player.profilePicture) {
+        const fileName = player.profilePicture.split('/').pop();
+
+        await this.s3Service.deleteFile('dancefitscoreboardbucket', fileName);
+      }
+
+      const fileName = `profilepic_${player.player_id}.${mimeType.split('/')[1]}`;
+      // profilepic_0.jpeg or .png
+
       await this.s3Service.uploadFile(
         'dancefitscoreboardbucket',
         fileName,
         imageBuffer,
         mimeType,
       );
-    } catch (err) {
-      console.log(err);
+
+      const profilePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`;
+
+      player.profilePicture = profilePictureURL;
+      await this.playerRepository.save(player);
+
+      return { message: 'Profile picture uploaded successfully' };
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      throw error;
     }
-
-    const profilePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`;
-
-    player.profilePicture = profilePictureURL;
-
-    await this.playerRepository.save(player);
-
-    return { message: 'Profile picture uploaded successfully' };
   }
 }

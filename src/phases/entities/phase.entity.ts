@@ -23,11 +23,11 @@ export class Phase {
     @Column()
     passing_players: number
 
-    @ManyToMany(() => Music, (music) => music.phases, { onDelete: 'CASCADE'})
+    @ManyToMany(() => Music, (music) => music.phases)
     @JoinTable()
     musics: Music[]
 
-    @ManyToOne(() => Category, (category) => category.phases)
+    @ManyToOne(() => Category, (category) => category.phases, { onDelete: 'CASCADE'})
     category: Category
 
     @OneToMany(() => Score, (score) => score.phase, { onDelete: 'CASCADE'})
