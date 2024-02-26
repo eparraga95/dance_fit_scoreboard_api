@@ -70,7 +70,7 @@ export class CategoriesService {
       where: { category_id: id },
       relations: {
         players: true,
-        phases: { musics: { scores: { player: true } } },
+        phases: { musics: true, scores: { player: true, music: true } },
         event: true,
       },
     });

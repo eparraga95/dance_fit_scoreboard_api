@@ -99,14 +99,30 @@ export class PhasesService {
 
   async update(phase_id: number, updatePhaseDetails: UpdatePhaseParams) {
     try {
+
+      const { music_number, modes_available } = updatePhaseDetails
+
       const phase = await this.phaseRepository.findOne({
         where: {
           phase_id: phase_id,
         },
+        relations: {
+          musics: true
+        }
       });
 
       if (!phase) {
         throw new NotFoundException('Phase not found');
+      }
+
+      // check if new music number is lower than the actual number of musis already assigned to this phase
+      if (music_number < phase.musics.length) {
+        throw new BadRequestException('Cannot set music number lower than the actual number of musics already assigned to this phase')
+      }
+
+      // check if the new modes_available will include all the already assigned musics mode
+      if (modes_available && phase.musics.some((m) => !modes_available.includes(m.mode))) {
+        throw new BadRequestException('Music modes cannot be updated since there are musics in this phase that will not respect the new modes available');
       }
 
       const updateResult = await this.phaseRepository.update(
