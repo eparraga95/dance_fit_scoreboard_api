@@ -2,6 +2,13 @@ import { Player } from 'src/players/entities/player.entity';
 
 export class CreateScoreDto {
   value: number;
+  perfect: number;
+  great: number;
+  good: number;
+  bad: number;
+  miss: number;
+  max_combo: number;
+  stage_pass: boolean;
   grade: string;
   plate: string;
   event_id: number;
@@ -12,6 +19,13 @@ export class CreateScoreDto {
 
 export type CreateScoreParams = {
   value: number;
+  perfect: number;
+  great: number;
+  good: number;
+  bad: number;
+  miss: number;
+  max_combo: number;
+  stage_pass: boolean;
   grade: string;
   plate: string;
   event_id: number;

@@ -22,6 +22,30 @@ export class Score {
   value: number;
 
   @Column()
+  perfect: number;
+
+  @Column()
+  great: number;
+
+  @Column()
+  good: number;
+
+  @Column()
+  bad: number;
+
+  @Column()
+  miss: number;
+
+  @Column()
+  max_combo: number;
+
+  @Column()
+  stage_pass: boolean;
+
+  @Column()
+  total_notes: number;
+
+  @Column()
   grade: string;
 
   @Column()
@@ -47,5 +71,5 @@ export class Score {
   music: Music;
 
   @ManyToOne(() => Phase, (phase) => phase.scores)
-  phase: Phase
+  phase: Phase;
 }
