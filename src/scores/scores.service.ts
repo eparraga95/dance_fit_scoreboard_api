@@ -124,10 +124,31 @@ export class ScoresService {
         );
       }
 
-      const { value, grade, plate } = scoreDetails;
+      const {
+        value,
+        grade,
+        plate,
+        perfect,
+        great,
+        good,
+        bad,
+        miss,
+        max_combo,
+        stage_pass
+      } = scoreDetails;
+
+      const total_notes = perfect + great + good + bad + miss;
 
       const newScore = this.scoreRepository.create({
         value: value,
+        perfect: perfect,
+        great: great,
+        good: good,
+        bad: bad,
+        miss: miss,
+        max_combo: max_combo,
+        stage_pass: stage_pass,
+        total_notes: total_notes,
         grade: grade,
         plate: plate,
         created_at: new Date(),
