@@ -48,7 +48,7 @@ export class Score {
   @Column()
   grade: string;
 
-  @Column()
+  @Column({ nullable: true})
   plate: string;
 
   @Column({ default: false })
