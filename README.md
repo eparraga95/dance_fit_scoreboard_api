@@ -53,6 +53,7 @@ The idea is to make it possible so a player can send a picture of their scores a
 | GET    | /scores/:id     | Find By Id | No Auth                                        | Query for a Score by its score_id                                       |
 | PATCH  | /scores/:id | Update     | Bearer Token, roles: 'admin' | Updates the Scores's updatable data                                     |
 | DELETE | /scores/:id | Delete     | Bearer Token, roles: 'admin'                   | Deletes a Score instance                                                |
+| POST   | /scores/admin     | Create     | Bearer Token, roles: 'admin'         | Creates a new instance of Score to a specific Player using its player_id. |
 
 ### Events
 ---
