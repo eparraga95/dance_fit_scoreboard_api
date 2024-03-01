@@ -12,6 +12,8 @@ import { Repository } from 'typeorm';
 import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Player } from 'src/players/entities/player.entity';
+import { adminAddPlayerParams } from './dto/adm-add-player.dto';
+import { adminRemovePlayerParams } from './dto/adm-remove-player.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -179,6 +181,52 @@ export class CategoriesService {
     }
   }
 
+  async adminAddPlayer(
+    adminAddPlayerDetails: adminAddPlayerParams,
+    category_id: number,
+  ) {
+    try {
+      const { player_id } = adminAddPlayerDetails;
+
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const category = await this.categoryRepository.findOne({
+        where: {
+          category_id: category_id,
+        },
+        relations: {
+          players: true,
+        },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const playerExists = category.players.some(
+        (p) => p.player_id == player_id,
+      );
+      if (playerExists) {
+        throw new BadRequestException(
+          'Player already assigned to this category',
+        );
+      }
+
+      category.players.push(player);
+
+      return await this.categoryRepository.save(category);
+    } catch (error: any) {
+      console.error('Error adding player to the category:', error);
+      throw error;
+    }
+  }
+
   async removePlayer(player_id: number, category_id: number) {
     try {
       const category = await this.categoryRepository.findOne({
@@ -193,7 +241,7 @@ export class CategoriesService {
       }
 
       const playerIndex = category.players.findIndex(
-        (player) => player.player_id === player_id,
+        (player) => player.player_id == player_id,
       );
       if (playerIndex === -1) {
         throw new BadRequestException(
@@ -208,6 +256,49 @@ export class CategoriesService {
         message: 'Player removed from category successfully',
       };
     } catch (error) {
+      console.error('Error removing player from category:', error);
+      throw error;
+    }
+  }
+
+  async adminRemovePlayer(
+    adminRemovePlayerDetails: adminRemovePlayerParams,
+    category_id: number,
+  ) {
+    try {
+      const { player_id } = adminRemovePlayerDetails;
+
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const category = await this.categoryRepository.findOne({
+        where: {
+          category_id: category_id,
+        },
+        relations: {
+          players: true,
+        },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      const playerIndex = category.players.findIndex(
+        (p) => p.player_id == player_id,
+      );
+      if (playerIndex === -1) {
+        throw new BadRequestException('Player not assigned to this category');
+      }
+
+      category.players.splice(playerIndex, 1);
+
+      return await this.categoryRepository.save(category);
+    } catch (error: any) {
       console.error('Error removing player from category:', error);
       throw error;
     }

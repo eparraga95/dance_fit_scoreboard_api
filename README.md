@@ -67,6 +67,8 @@ The idea is to make it possible so a player can send a picture of their scores a
 | DELETE | /events/:id | Delete     | Bearer Token, roles: 'admin'                   | Deletes an Event instance                                               |
 | PATCH   | /events/:id/join | Join Event | Bearer Token, roles: 'admin', 'player' | Enrolls the logged in Player instance to an Event instance |
 | PATCH   | /events/:id/leave | Leave Event | Bearer Token, roles: 'admin', 'player' | Detach the logged in Player instance from an Event instance |
+| PATCH   | /events/:id/admin/add_player | Add Player | Bearer Token, roles: 'admin' | An Admin can enroll a Player instance to an Event |
+| PATCH   | /events/:id/admin/remove_player | Remove Player | Bearer Token, roles: 'admin', 'player' | An Admin can remove a Player instance from an Event instance |
 
 
 ### Musics
@@ -92,6 +94,8 @@ The idea is to make it possible so a player can send a picture of their scores a
 | DELETE | /categories/:id        | Delete       | Bearer token, roles: 'admin' | Deletes a Category                                                                             |
 | PATCH  | /categories/:id/join   | Add Player    | Bearer token, roles: 'player' | Enrolls a Player instance to a Category's player list                                            |
 | PATCH  | /categories/:id/leave | Remove Player | Bearer token, roles: 'player' | Removes a Player from a Category's player list                                                   |
+| PATCH  | /categories/:id/admin/add_player | Add Player | Bearer token, roles: 'admin' | An Admin can enroll a Player from a Category's player list                                                   |
+| PATCH  | /categories/:id/admin/remove_player | Remove Player | Bearer token, roles: 'admin' | An Admin can remove a Player from a Category's player list                                                   |
 
 ### Phases
 ---
