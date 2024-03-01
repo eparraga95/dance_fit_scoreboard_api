@@ -14,6 +14,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Phase } from 'src/phases/entities/phase.entity';
+import { adminCreateScoreParams } from './dto/adm-create-score.dto';
 
 @Injectable()
 export class ScoresService {
@@ -134,7 +135,7 @@ export class ScoresService {
         bad,
         miss,
         max_combo,
-        stage_pass
+        stage_pass,
       } = scoreDetails;
 
       const total_notes = perfect + great + good + bad + miss;
@@ -164,6 +165,142 @@ export class ScoresService {
       console.error('Error creating score:', error);
       throw error;
     }
+  }
+
+  async adminCreate(scoreDetails: adminCreateScoreParams) {
+    try {
+      const { player_id, event_id, music_id, category_id, phase_id } =
+        scoreDetails;
+
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+        relations: { events: true },
+      });
+
+      const event = await this.eventRepository.findOne({
+        where: { event_id: event_id },
+        relations: {
+          categories: true,
+        },
+      });
+
+      if (!event) throw new NotFoundException('Event not Found');
+
+      if (!player.events.some((e) => e.name === event.name)) {
+        throw new BadRequestException(
+          'Player is not a participant of selected Event',
+        );
+      }
+
+      if (!event.categories.some((c) => c.category_id == category_id)) {
+        throw new BadRequestException(
+          'This Category is not assigned to this Event',
+        );
+      }
+
+      const music = await this.musicRepository.findOne({
+        where: { music_id: music_id },
+      });
+
+      if (!music) {
+        throw new NotFoundException('Music not found');
+      }
+
+      const category = await this.categoryRepository.findOne({
+        where: {
+          category_id: category_id,
+        },
+        relations: {
+          players: true,
+        },
+      });
+
+      if (!category) {
+        throw new NotFoundException('Category not found');
+      }
+
+      if (!category.players.some((p) => p.nickname === player.nickname)) {
+        throw new BadRequestException(
+          'Player is not assigned to this Category in this Event',
+        );
+      }
+
+      const phase = await this.phaseRepository.findOne({
+        where: {
+          phase_id: phase_id,
+        },
+        relations: {
+          musics: true,
+        },
+      });
+
+      if (!phase) {
+        throw new NotFoundException('Phase not found');
+      }
+
+      if (!phase.musics.some((m) => m.music_id == music.music_id)) {
+        throw new BadRequestException(
+          'This Music is not assigned to this Phase',
+        );
+      }
+
+      const identicalScore = await this.scoreRepository.findOne({
+        where: {
+          player: player,
+          event: event,
+          category: category,
+          music: music,
+          phase: phase,
+        },
+      });
+
+      if (identicalScore) {
+        throw new BadRequestException(
+          'There can be only one instance of a Score created by a Player to a Music, inside a Category Phase of an Event',
+        );
+      }
+
+      const {
+        value,
+        grade,
+        plate,
+        perfect,
+        great,
+        good,
+        bad,
+        miss,
+        max_combo,
+        stage_pass,
+      } = scoreDetails;
+
+      const total_notes = perfect + great + good + bad + miss;
+
+      const newScore = this.scoreRepository.create({
+        value: value,
+        perfect: perfect,
+        great: great,
+        good: good,
+        bad: bad,
+        miss: miss,
+        max_combo: max_combo,
+        stage_pass: stage_pass,
+        total_notes: total_notes,
+        grade: grade,
+        plate: plate,
+        created_at: new Date(),
+        player: player,
+        event: event,
+        music: music,
+        category: category,
+        phase: phase,
+      });
+
+      return await this.scoreRepository.save(newScore);
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+    } catch (error) {}
   }
 
   async findAll() {

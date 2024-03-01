@@ -50,16 +50,10 @@ export class AuthService {
 
   async createSession(player: Player) {
 
-    console.log(player)
     try {
-      const existingSession = await this.sessionRepository.findOne({
-        where: {
-          session_id: player.session?.session_id,
-        },
-      });
 
-      if (existingSession) {
-        await this.sessionRepository.delete(existingSession);
+      if (player.session) {
+        await this.sessionRepository.delete(player.session)
       }
 
       const newSessionData = {
