@@ -60,7 +60,7 @@ export class PlayersController {
     return this.playersService.uploadProfilePicture(player_id, buffer, mimeType);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AdminGuard, AuthGuard)
   @Get()
   findAll() {
     return this.playersService.findAll();
