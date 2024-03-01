@@ -10,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Repository } from 'typeorm';
 import { Player } from 'src/players/entities/player.entity';
+import { adminAddPlayerParams } from './dto/adm-add-player.dto';
+import { adminRemovePlayerParams } from './dto/adm-remove-player.dto';
 
 @Injectable()
 export class EventsService {
@@ -78,6 +80,45 @@ export class EventsService {
     }
   }
 
+  async adminAddPlayer(
+    adminAddPlayerDetails: adminAddPlayerParams,
+    event_id: number,
+  ) {
+    try {
+      const { player_id } = adminAddPlayerDetails;
+
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+        relations: { players: true },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const playerExists = event.players.some((p) => p.player_id == player_id);
+      if (playerExists) {
+        throw new BadRequestException('Player already assigned to this event');
+      }
+
+      event.players.push(player);
+
+      return await this.eventRepository.save(event);
+    } catch (error: any) {
+      console.error('Error adding player to the event:', error);
+      throw error;
+    }
+  }
+
   async removePlayer(player_id: number, event_id: number) {
     try {
       const player = await this.playerRepository.findOne({
@@ -94,8 +135,12 @@ export class EventsService {
         relations: { players: true },
       });
 
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
       const playerIndex = event.players.findIndex(
-        (p) => p.player_id === player_id,
+        (p) => p.player_id == player_id,
       );
       if (playerIndex === -1) {
         throw new BadRequestException('Player not assigned to this event');
@@ -105,6 +150,48 @@ export class EventsService {
 
       return await this.eventRepository.save(event);
     } catch (error) {
+      console.error('Error removing player from event:', error);
+      throw error;
+    }
+  }
+
+  async adminRemovePlayer(
+    adminRemovePlayerDetails: adminRemovePlayerParams,
+    event_id: number,
+  ) {
+    try {
+      const { player_id } = adminRemovePlayerDetails;
+
+      const player = await this.playerRepository.findOne({
+        where: { player_id: player_id },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+        relations: { players: true },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const playerIndex = event.players.findIndex(
+        (p) => p.player_id == player_id,
+      );
+      if (playerIndex === -1) {
+        throw new BadRequestException('Player not assigned to this event');
+      }
+
+      event.players.splice(playerIndex, 1);
+
+      return await this.eventRepository.save(event);
+    } catch (error: any) {
       console.error('Error removing player from event:', error);
       throw error;
     }
