@@ -20,7 +20,17 @@ export class PlayersService {
 
   async create(playerDetails: CreatePlayerParams) {
     try {
-      const { password, confirmPassword } = playerDetails;
+      const { nickname, password, confirmPassword } = playerDetails;
+
+      const existingNickname = await this.playerRepository.findOne({
+        where: {
+          nickname: nickname
+        }
+      })
+
+      if (existingNickname) {
+        throw new BadRequestException("Nickname already in use")
+      }
 
       if (password != confirmPassword) {
         throw new BadRequestException('Passwords must match');
