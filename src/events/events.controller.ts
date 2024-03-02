@@ -27,13 +27,11 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.eventsService.findAll();
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventsService.findOne(+id);
