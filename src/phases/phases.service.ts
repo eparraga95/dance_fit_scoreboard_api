@@ -22,7 +22,7 @@ export class PhasesService {
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
     @InjectRepository(Music) private musicRepository: Repository<Music>,
-    @InjectRepository(Score) private scoreRepository: Repository<Score>
+    @InjectRepository(Score) private scoreRepository: Repository<Score>,
   ) {}
 
   async create(createPhaseDetails: CreatePhaseParams) {
@@ -279,17 +279,21 @@ export class PhasesService {
         (score) => score.music.music_id !== music_id,
       );
 
+      phase.musics = phase.musics.filter(
+        (music) => music.music_id !== music_id,
+      );
+
       // delete all scores related to the music that was registered to this fase
 
       const scoresToDelete = await this.scoreRepository.find({
         where: {
           phase: phase,
           music: music,
-        }
-      })
+        },
+      });
 
-      const deletionResult = await this.scoreRepository.remove(scoresToDelete)
-      
+      const deletionResult = await this.scoreRepository.remove(scoresToDelete);
+
       await this.phaseRepository.save(phase);
 
       return phase;
