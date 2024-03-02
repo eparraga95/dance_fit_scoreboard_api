@@ -310,6 +310,7 @@ export class ScoresService {
         music: true,
         event: true,
         category: true,
+        phase: true,
       },
     });
   }

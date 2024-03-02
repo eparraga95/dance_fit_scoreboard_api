@@ -99,16 +99,15 @@ export class PhasesService {
 
   async update(phase_id: number, updatePhaseDetails: UpdatePhaseParams) {
     try {
-
-      const { music_number, modes_available } = updatePhaseDetails
+      const { music_number, modes_available } = updatePhaseDetails;
 
       const phase = await this.phaseRepository.findOne({
         where: {
           phase_id: phase_id,
         },
         relations: {
-          musics: true
-        }
+          musics: true,
+        },
       });
 
       if (!phase) {
@@ -117,12 +116,19 @@ export class PhasesService {
 
       // check if new music number is lower than the actual number of musis already assigned to this phase
       if (music_number < phase.musics.length) {
-        throw new BadRequestException('Cannot set music number lower than the actual number of musics already assigned to this phase')
+        throw new BadRequestException(
+          'Cannot set music number lower than the actual number of musics already assigned to this phase',
+        );
       }
 
       // check if the new modes_available will include all the already assigned musics mode
-      if (modes_available && phase.musics.some((m) => !modes_available.includes(m.mode))) {
-        throw new BadRequestException('Music modes cannot be updated since there are musics in this phase that will not respect the new modes available');
+      if (
+        modes_available &&
+        phase.musics.some((m) => !modes_available.includes(m.mode))
+      ) {
+        throw new BadRequestException(
+          'Music modes cannot be updated since there are musics in this phase that will not respect the new modes available',
+        );
       }
 
       const updateResult = await this.phaseRepository.update(
@@ -160,7 +166,7 @@ export class PhasesService {
       const deletionResult = await this.phaseRepository.delete(phase_id);
 
       if (deletionResult.affected === 0) {
-        throw new InternalServerErrorException('Failed to delete phase')
+        throw new InternalServerErrorException('Failed to delete phase');
       }
 
       return { message: 'Phase deleted successfully' };
@@ -208,7 +214,9 @@ export class PhasesService {
       }
 
       if (phase.musics.some((m) => m.music_id == music.music_id)) {
-        throw new BadRequestException('Music is already assigned to this phase')
+        throw new BadRequestException(
+          'Music is already assigned to this phase',
+        );
       }
 
       if (phase.musics.length >= phase.music_number) {
@@ -242,6 +250,7 @@ export class PhasesService {
         },
         relations: {
           musics: true,
+          scores: { music: true },
         },
       });
 
@@ -264,6 +273,9 @@ export class PhasesService {
       if (!phase.musics.some((m) => m.music_id == music_id)) {
         throw new BadRequestException('Music is not assigned to this Phase');
       }
+      phase.scores = phase.scores.filter(
+        (score) => score.music.music_id !== music_id,
+      );
 
       phase.musics = phase.musics.filter((m) => m.music_id != music_id);
 
