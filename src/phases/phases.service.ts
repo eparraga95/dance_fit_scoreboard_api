@@ -275,14 +275,19 @@ export class PhasesService {
       if (!phase.musics.some((m) => m.music_id == music_id)) {
         throw new BadRequestException('Music is not assigned to this Phase');
       }
+
       phase.scores = phase.scores.filter(
         (score) => score.music.music_id !== music_id,
       );
 
-      phase.musics = phase.musics.filter(
-        (music) => music.music_id !== music_id,
-      );
+      const musicIndex = phase.musics.findIndex((m) => m.music_id == music_id);
+      if (musicIndex === -1) {
+        throw new BadRequestException('Music is not assigned to this Phase');
+      }
 
+      phase.musics.splice(musicIndex, 1);
+
+      await this.phaseRepository.save(phase);
       // delete all scores related to the music that was registered to this fase
 
       const scoresToDelete = await this.scoreRepository.find({
@@ -293,8 +298,6 @@ export class PhasesService {
       });
 
       const deletionResult = await this.scoreRepository.remove(scoresToDelete);
-
-      await this.phaseRepository.save(phase);
 
       return phase;
     } catch (error) {
