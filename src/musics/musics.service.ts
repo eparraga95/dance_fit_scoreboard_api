@@ -8,7 +8,7 @@ import { CreateMusicDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Music } from './entities/music.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class MusicsService {
@@ -60,12 +60,32 @@ export class MusicsService {
 
   async update(music_id: number, updateMusicDto: UpdateMusicDto) {
     try {
-      const music = await this.musicRepository.findOne({
+      const musicToUpdate = await this.musicRepository.findOne({
         where: { music_id: music_id },
       });
 
-      if (!music) {
+      if (!musicToUpdate) {
         throw new NotFoundException('Music not found');
+      }
+
+      const potentialUpdatedMusic = this.musicRepository.create({
+        ...musicToUpdate,
+        ...updateMusicDto,
+      });
+
+      const potentialMusicDuplicate = await this.musicRepository.findOne({
+        where: {
+          name: potentialUpdatedMusic.name,
+          level: potentialUpdatedMusic.level,
+          mode: potentialUpdatedMusic.mode,
+          music_id: Not(music_id),
+        },
+      });
+
+      if (potentialMusicDuplicate) {
+        throw new BadRequestException(
+          'Updating would result in duplicate music',
+        );
       }
 
       const updateResult = await this.musicRepository.update(
