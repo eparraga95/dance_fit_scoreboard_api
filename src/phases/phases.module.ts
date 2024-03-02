@@ -8,10 +8,11 @@ import { Phase } from './entities/phase.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { Session } from 'src/auth/entities/session.entity';
 import { Music } from 'src/musics/entities/music.entity';
+import { Score } from 'src/scores/entities/score.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Phase, Category, Session, Music]), JwtModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Phase, Category, Session, Music, Score]), JwtModule, AuthModule],
   controllers: [PhasesController],
   providers: [PhasesService],
 })
