@@ -67,7 +67,7 @@ export class AuthService {
           },
           {
             secret: process.env.jwtSecret,
-            expiresIn: '1h',
+            expiresIn: '3h',
           },
         ),
         player: player,
