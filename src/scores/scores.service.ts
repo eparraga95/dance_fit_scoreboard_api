@@ -371,7 +371,11 @@ export class ScoresService {
         throw new NotFoundException('Score not found');
       }
 
-      const deletionResult = await this.scoreRepository.delete(score);
+      console.log(score)
+
+      const deletionResult = await this.scoreRepository.delete({score_id: score.score_id});
+
+      console.log(deletionResult)
 
       if (deletionResult.affected === 0) {
         throw new InternalServerErrorException('Failed to delete score');
@@ -379,6 +383,7 @@ export class ScoresService {
 
       return { message: 'Score deleted successfully' };
     } catch (error) {
+      console.log(error)
       console.error('Error deleting score:', error);
       throw error;
     }
