@@ -165,7 +165,9 @@ export class PhasesService {
         throw new NotFoundException('Phase not found');
       }
 
-      const deletionResult = await this.phaseRepository.delete(phase_id);
+      const deletionResult = await this.phaseRepository.delete({
+        phase_id: phase.phase_id,
+      });
 
       if (deletionResult.affected === 0) {
         throw new InternalServerErrorException('Failed to delete phase');

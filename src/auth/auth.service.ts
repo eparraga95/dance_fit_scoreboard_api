@@ -52,8 +52,10 @@ export class AuthService {
 
     try {
 
+      const { token } = player.session
+
       if (player.session) {
-        await this.sessionRepository.delete(player.session)
+        await this.sessionRepository.delete({ token: token })
       }
 
       const newSessionData = {
