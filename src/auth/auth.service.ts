@@ -99,19 +99,4 @@ export class AuthService {
     };
   }
 
-  async hashPasswordsForAllPlayers() {
-    try {
-      const players = await this.playerRepository.find();
-      
-      for (const player of players) {
-        const hashedPassword = await bcrypt.hash(player.password, 10); // Hash the password
-        player.password = hashedPassword; // Update the player's password
-      }
-
-      await this.playerRepository.save(players); // Save all players with hashed passwords
-    } catch (error) {
-      console.error('Error hashing passwords:', error);
-      throw error;
-    }
-  }
 }

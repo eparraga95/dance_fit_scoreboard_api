@@ -30,9 +30,4 @@ export class AuthController {
   async adminAuth() {
     return true;
   }
-
-  @Patch('/hash')
-  async hashPasswords() {
-    return this.authService.hashPasswordsForAllPlayers()
-  }
 }
