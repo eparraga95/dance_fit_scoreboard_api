@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { loginParams } from './dto/login.dto';
 import { Session } from './entities/session.entity';
 import { REQUEST } from '@nestjs/core';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
@@ -37,8 +38,10 @@ export class AuthService {
       if (!player)
         throw new NotFoundException('Player nickname/password incorrect');
 
-      if (player.password === password) {
-        return await this.createSession(player);
+      const passwordMatch = await bcrypt.compare(password, player.password)
+
+      if (passwordMatch) {
+        return await this.createSession(player)
       }
 
       throw new UnauthorizedException('Player nickname/password incorrect');
@@ -94,5 +97,21 @@ export class AuthService {
     return {
       message: 'Logged out succesfully',
     };
+  }
+
+  async hashPasswordsForAllPlayers() {
+    try {
+      const players = await this.playerRepository.find();
+      
+      for (const player of players) {
+        const hashedPassword = await bcrypt.hash(player.password, 10); // Hash the password
+        player.password = hashedPassword; // Update the player's password
+      }
+
+      await this.playerRepository.save(players); // Save all players with hashed passwords
+    } catch (error) {
+      console.error('Error hashing passwords:', error);
+      throw error;
+    }
   }
 }

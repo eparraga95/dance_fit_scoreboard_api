@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { loginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
@@ -29,5 +29,10 @@ export class AuthController {
   @Get('/admin')
   async adminAuth() {
     return true;
+  }
+
+  @Patch('/hash')
+  async hashPasswords() {
+    return this.authService.hashPasswordsForAllPlayers()
   }
 }
