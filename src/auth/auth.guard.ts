@@ -5,48 +5,39 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Session } from './entities/session.entity';
-import { Repository } from 'typeorm';
 import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    @InjectRepository(Session) private sessionRepository: Repository<Session>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const requestToken: string = request.headers.authorization.split(' ')[1];
+    const token = this.extractTokenFromHeader(request);
 
-    if (!requestToken) {
+    if (!token) {
       throw new UnauthorizedException('No Token Found');
     }
 
-    const session = await this.sessionRepository.findOne({
-      where: { token: requestToken },
-    });
+    const secretTest = process.env.jwtSecret
+    console.log(secretTest)
 
-    if (!session) {
-      throw new UnauthorizedException('Invalid token');
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.jwtSecret,
+      });
+      request['user'] = payload;
+    } catch {
+      throw new UnauthorizedException();
     }
-
-    const now = new Date();
-
-    const decodedJwt = this.jwtService.decode(session.token);
-
-    const jwtExpiration = new Date(decodedJwt.exp * 1000);
-
-    if (now > jwtExpiration) {
-      throw new UnauthorizedException('Session expired');
-    }
-
-    request.user = this.jwtService.verify(session.token, {
-      secret: process.env.jwtSecret,
-    })
 
     return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }
