@@ -10,24 +10,7 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() loginDto: loginDto) {
-    return this.authService.validatePlayer(loginDto);
+    return this.authService.signIn(loginDto);
   }
 
-  @UseGuards(AuthGuard)
-  @Delete('/logout')
-  async logout() {
-    return this.authService.removeSession();
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('/session')
-  async sessionAuth() {
-    return true;
-  }
-
-  @UseGuards(AuthGuard, AdminGuard)
-  @Get('/admin')
-  async adminAuth() {
-    return true;
-  }
 }
