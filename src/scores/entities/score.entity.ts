@@ -57,19 +57,19 @@ export class Score {
   @Column()
   created_at: Date;
 
-  @ManyToOne(() => Player, (player) => player.scores)
+  @ManyToOne(() => Player, (player) => player.scores, { onDelete: 'CASCADE' })
   @JoinColumn()
   player: Player;
 
-  @ManyToOne(() => Event, (event) => event.scores)
+  @ManyToOne(() => Event, (event) => event.scores, { onDelete: 'CASCADE' })
   event: Event;
 
-  @ManyToOne(() => Category, (category) => category.scores)
+  @ManyToOne(() => Category, (category) => category.scores, { onDelete: 'CASCADE' })
   category: Category;
 
-  @ManyToOne(() => Music, (music) => music.scores)
+  @ManyToOne(() => Music, (music) => music.scores, { onDelete: 'CASCADE' })
   music: Music;
 
-  @ManyToOne(() => Phase, (phase) => phase.scores)
+  @ManyToOne(() => Phase, (phase) => phase.scores, { onDelete: 'CASCADE' })
   phase: Phase;
 }

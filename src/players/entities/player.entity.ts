@@ -11,7 +11,6 @@ import {
 import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { Category } from 'src/categories/entities/category.entity';
-import { Session } from 'src/auth/entities/session.entity';
 
 @Entity({ name: 'players' })
 export class Player {
@@ -42,8 +41,4 @@ export class Player {
   @ManyToMany(() => Category, (category) => category.players, { cascade: true })
   @JoinTable()
   categories: Category[];
-
-  @OneToOne(() => Player, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  session: Session;
 }

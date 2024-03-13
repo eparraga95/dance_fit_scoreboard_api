@@ -7,13 +7,12 @@ import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
-import { Session } from 'src/auth/entities/session.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { Player } from 'src/players/entities/player.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category, Music, Score, Event, Session, Player]),
+    TypeOrmModule.forFeature([Category, Music, Score, Event, Player]),
     JwtModule,
     AuthModule,
   ],

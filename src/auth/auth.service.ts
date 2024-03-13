@@ -1,6 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
 import {
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,8 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from 'src/players/entities/player.entity';
 import { Repository } from 'typeorm';
-import { loginDto, loginParams } from './dto/login.dto';
-import { Session } from './entities/session.entity';
+import { loginParams } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -19,7 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(loginDetails: loginDto) {
+  async signIn(loginDetails: loginParams) {
 
     const { nickname, password } = loginDetails;
 

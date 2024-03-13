@@ -5,16 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Session } from './entities/session.entity';
-import { Repository } from 'typeorm';
 import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    @InjectRepository(Session) private sessionRepository: Repository<Session>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

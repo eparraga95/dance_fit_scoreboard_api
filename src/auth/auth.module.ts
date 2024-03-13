@@ -6,13 +6,12 @@ import { Player } from 'src/players/entities/player.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PlayersService } from 'src/players/players.service';
-import { Session } from './entities/session.entity';
 import { S3Service } from 'src/aws/s3.service';
 require('dotenv').config()
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Player, Session]),
+    TypeOrmModule.forFeature([Player]),
     PassportModule,
     JwtModule.register({
       global: true,
