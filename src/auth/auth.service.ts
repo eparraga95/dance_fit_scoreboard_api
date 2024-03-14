@@ -17,8 +17,28 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(loginDetails: loginParams) {
+  async validatePlayer(nickname: string, pass: string): Promise<any> {
+    const player = await this.playerRepository.findOne({
+      where: {
+        nickname: nickname,
+      },
+    });
 
+    if (!player)
+      throw new NotFoundException('Player nickname/password incorrect');
+
+    const passwordMatch = await bcrypt.compare(pass, player.password);
+
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Player nickname/password incorrect');
+    }
+
+    const { password, ...safePlayer } = player;
+
+    return safePlayer;
+  }
+
+  async login(loginDetails: loginParams) {
     const { nickname, password } = loginDetails;
 
     const player = await this.playerRepository.findOne({
@@ -43,7 +63,7 @@ export class AuthService {
     };
 
     return {
-      access_token: await this.jwtService.signAsync(payload)
-    }
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

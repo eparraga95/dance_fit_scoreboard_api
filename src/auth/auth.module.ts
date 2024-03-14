@@ -7,6 +7,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PlayersService } from 'src/players/players.service';
 import { S3Service } from 'src/aws/s3.service';
+import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
 require('dotenv').config()
 
 @Module({
@@ -21,7 +23,7 @@ require('dotenv').config()
       }
     }),
   ],
-  providers: [AuthService, PlayersService, S3Service],
+  providers: [AuthService, PlayersService, S3Service, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
