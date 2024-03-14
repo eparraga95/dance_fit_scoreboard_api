@@ -1,8 +1,15 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class CreatePhaseDto {
+  @ApiProperty()
   phase_number: number;
+  @ApiProperty()
   music_number: number;
+  @ApiProperty()
   modes_available: string[];
+  @ApiProperty()
   passing_players: number;
+  @ApiProperty()
   category_id: number;
 }
 

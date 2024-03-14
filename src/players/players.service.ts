@@ -19,9 +19,9 @@ export class PlayersService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async create(playerDetails: CreatePlayerParams) {
+  async create(createPlayerDetails: CreatePlayerParams) {
     try {
-      const { nickname, password, confirmPassword } = playerDetails;
+      const { nickname, password, confirmPassword } = createPlayerDetails;
 
       const existingNickname = await this.playerRepository.findOne({
         where: {
@@ -40,7 +40,7 @@ export class PlayersService {
       const hashedPassword = await bcrypt.hash(password, 10)
 
       const newPlayer = this.playerRepository.create({
-        ...playerDetails,
+        ...createPlayerDetails,
         password: hashedPassword,
         role: 'player',
       });

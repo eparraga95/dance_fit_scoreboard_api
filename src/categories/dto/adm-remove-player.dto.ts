@@ -1,7 +1,10 @@
-export class adminRemovePlayerDto {
+import { ApiProperty } from "@nestjs/swagger"
+
+export class AdminRemovePlayerDto {
+    @ApiProperty()
     player_id: number
 }
 
-export class adminRemovePlayerParams {
+export type AdminRemovePlayerParams = {
     player_id: number
 }

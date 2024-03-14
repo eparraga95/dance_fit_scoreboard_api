@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from 'src/players/entities/player.entity';
 import { Repository } from 'typeorm';
-import { loginParams } from './dto/login.dto';
+import { LoginParams } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(loginDetails: loginParams) {
+  async signIn(loginDetails: LoginParams) {
 
     const { nickname, password } = loginDetails;
 

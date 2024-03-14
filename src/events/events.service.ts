@@ -10,8 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Repository } from 'typeorm';
 import { Player } from 'src/players/entities/player.entity';
-import { adminAddPlayerParams } from './dto/adm-add-player.dto';
-import { adminRemovePlayerParams } from './dto/adm-remove-player.dto';
+import { AdminAddPlayerParams } from './dto/adm-add-player.dto';
+import { AdminRemovePlayerParams } from './dto/adm-remove-player.dto';
 
 @Injectable()
 export class EventsService {
@@ -81,7 +81,7 @@ export class EventsService {
   }
 
   async adminAddPlayer(
-    adminAddPlayerDetails: adminAddPlayerParams,
+    adminAddPlayerDetails: AdminAddPlayerParams,
     event_id: number,
   ) {
     try {
@@ -156,7 +156,7 @@ export class EventsService {
   }
 
   async adminRemovePlayer(
-    adminRemovePlayerDetails: adminRemovePlayerParams,
+    adminRemovePlayerDetails: AdminRemovePlayerParams,
     event_id: number,
   ) {
     try {

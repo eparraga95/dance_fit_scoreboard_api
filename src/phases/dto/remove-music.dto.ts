@@ -1,4 +1,7 @@
-export interface RemoveMusicDto {
+import { ApiProperty } from "@nestjs/swagger";
+
+export class RemoveMusicDto {
+  @ApiProperty()
   music_id: number;
 }
 

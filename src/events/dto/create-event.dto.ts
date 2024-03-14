@@ -1,5 +1,9 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class CreateEventDto {
+  @ApiProperty()
   name: string;
+  @ApiProperty()
   status: boolean;
 }
 
