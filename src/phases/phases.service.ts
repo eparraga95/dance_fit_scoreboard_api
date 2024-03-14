@@ -299,7 +299,7 @@ export class PhasesService {
         },
       });
 
-      const deletionResult = await this.scoreRepository.remove(scoresToDelete);
+      await this.scoreRepository.remove(scoresToDelete);
 
       return phase;
     } catch (error) {

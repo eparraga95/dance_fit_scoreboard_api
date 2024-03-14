@@ -30,8 +30,8 @@ export class ScoresController {
 
   @UseGuards(AdminGuard, AuthGuard)
   @Post('/admin')
-  adminCreate(@Body()  admCreateScoreDto: AdminCreateScoreDto) {
-    return this.scoresService.adminCreate(admCreateScoreDto)
+  adminCreate(@Body() admCreateScoreDto: AdminCreateScoreDto) {
+    return this.scoresService.adminCreate(admCreateScoreDto);
   }
 
   @Get()

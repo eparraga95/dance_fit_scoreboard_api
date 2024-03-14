@@ -55,9 +55,13 @@ export class PlayersController {
 
     const buffer = Buffer.from(file.buffer);
 
-    const mimeType = file.mimetype
+    const mimeType = file.mimetype;
 
-    return this.playersService.uploadProfilePicture(player_id, buffer, mimeType);
+    return this.playersService.uploadProfilePicture(
+      player_id,
+      buffer,
+      mimeType,
+    );
   }
 
   @UseGuards(AdminGuard, AuthGuard)

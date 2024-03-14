@@ -1,8 +1,6 @@
-import { Body, Controller, Delete, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from './auth.guard';
-import { AdminGuard } from './admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,5 +10,4 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.signIn(loginDto);
   }
-
 }

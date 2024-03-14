@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PlayersService } from 'src/players/players.service';
 import { S3Service } from 'src/aws/s3.service';
-require('dotenv').config()
+require('dotenv').config();
 
 @Module({
   imports: [
@@ -17,8 +17,8 @@ require('dotenv').config()
       global: true,
       secret: process.env.jwtSecret,
       signOptions: {
-        expiresIn: '3h'
-      }
+        expiresIn: '3h',
+      },
     }),
   ],
   providers: [AuthService, PlayersService, S3Service],

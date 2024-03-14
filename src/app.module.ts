@@ -29,7 +29,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
   providers: [AppService],
 })
 export class AppModule {
-
   static configureSwagger(app: INestApplication) {
     const options = new DocumentBuilder()
       .setTitle('Dance Fit Scoreboard API')
@@ -38,9 +37,8 @@ export class AppModule {
       )
       .setVersion('1.0')
       .addBearerAuth()
-      .build()
-    const document = SwaggerModule.createDocument(app, options)
-    SwaggerModule.setup('api', app, document)
+      .build();
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('api', app, document);
   }
-
 }

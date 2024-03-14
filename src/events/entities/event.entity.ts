@@ -22,12 +22,14 @@ export class Event {
   @Column({ default: true })
   status: boolean;
 
-  @ManyToMany(() => Player, (player) => player.events, { onDelete: 'CASCADE'})
+  @ManyToMany(() => Player, (player) => player.events, { onDelete: 'CASCADE' })
   players: Player[];
 
   @OneToMany(() => Score, (score) => score.event)
   scores: Score[];
 
-  @OneToMany(() => Category, (category) => category.event, { onDelete: 'CASCADE'})
+  @OneToMany(() => Category, (category) => category.event, {
+    onDelete: 'CASCADE',
+  })
   categories: Category[];
 }

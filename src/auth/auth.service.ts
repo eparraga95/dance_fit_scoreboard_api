@@ -18,7 +18,6 @@ export class AuthService {
   ) {}
 
   async signIn(loginDetails: LoginParams) {
-
     const { nickname, password } = loginDetails;
 
     const player = await this.playerRepository.findOne({
@@ -43,7 +42,7 @@ export class AuthService {
     };
 
     return {
-      access_token: await this.jwtService.signAsync(payload)
-    }
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

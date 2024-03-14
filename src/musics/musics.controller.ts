@@ -10,10 +10,9 @@ import {
 } from '@nestjs/common';
 import { MusicsService } from './musics.service';
 import { CreateMusicDto } from './dto/create-music.dto';
-import { updateMusicDto } from './dto/update-music.dto';
+import { UpdateMusicDto } from './dto/update-music.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
-
 
 @Controller('musics')
 export class MusicsController {
@@ -39,7 +38,7 @@ export class MusicsController {
 
   @UseGuards(AuthGuard, AdminGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMusicDto: updateMusicDto) {
+  update(@Param('id') id: string, @Body() updateMusicDto: UpdateMusicDto) {
     return this.musicsService.update(+id, updateMusicDto);
   }
 

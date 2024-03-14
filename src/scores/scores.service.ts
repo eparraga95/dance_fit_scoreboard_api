@@ -170,7 +170,7 @@ export class ScoresService {
   async adminCreate(adminCreateScoreDetails: AdminCreateScoreParams) {
     try {
       const { player_id, event_id, music_id, category_id, phase_id } =
-      adminCreateScoreDetails;
+        adminCreateScoreDetails;
 
       const player = await this.playerRepository.findOne({
         where: { player_id: player_id },
@@ -371,7 +371,9 @@ export class ScoresService {
         throw new NotFoundException('Score not found');
       }
 
-      const deletionResult = await this.scoreRepository.delete({score_id: score.score_id});
+      const deletionResult = await this.scoreRepository.delete({
+        score_id: score.score_id,
+      });
 
       if (deletionResult.affected === 0) {
         throw new InternalServerErrorException('Failed to delete score');

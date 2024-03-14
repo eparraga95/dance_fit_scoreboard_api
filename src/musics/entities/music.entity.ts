@@ -1,4 +1,3 @@
-import { Category } from 'src/categories/entities/category.entity';
 import { Phase } from 'src/phases/entities/phase.entity';
 import { Score } from 'src/scores/entities/score.entity';
 import {
@@ -26,10 +25,10 @@ export class Music {
   @Column()
   mode: string;
 
-  @OneToMany(() => Score, (score) => score.music, { onDelete: 'CASCADE'})
+  @OneToMany(() => Score, (score) => score.music, { onDelete: 'CASCADE' })
   @JoinColumn()
   scores: Score[];
 
-  @ManyToMany(() => Phase, (phase) => phase.musics, { onDelete: 'CASCADE'})
-  phases: Phase[]
+  @ManyToMany(() => Phase, (phase) => phase.musics, { onDelete: 'CASCADE' })
+  phases: Phase[];
 }

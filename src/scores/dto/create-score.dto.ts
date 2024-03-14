@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateScoreDto {
   @ApiProperty()
@@ -28,7 +28,7 @@ export class CreateScoreDto {
   @ApiProperty()
   category_id: number;
   @ApiProperty()
-  phase_id: number
+  phase_id: number;
 }
 
 export type CreateScoreParams = {

@@ -2,7 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateMusicDto } from './create-music.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class updateMusicDto extends PartialType(CreateMusicDto) {
+export class UpdateMusicDto extends PartialType(CreateMusicDto) {
   @ApiProperty()
   name: string;
   @ApiProperty()

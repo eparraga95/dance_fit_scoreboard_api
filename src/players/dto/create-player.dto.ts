@@ -13,4 +13,4 @@ export type CreatePlayerParams = {
   nickname: string;
   password: string;
   confirmPassword: string;
-}
+};

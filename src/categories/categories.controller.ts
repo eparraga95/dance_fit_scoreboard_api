@@ -43,7 +43,7 @@ export class CategoriesController {
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
   }
-  
+
   @UseGuards(AdminGuard, AuthGuard)
   @Patch(':id/admin/add_player')
   adminAddPlayer(
@@ -59,7 +59,10 @@ export class CategoriesController {
     @Body() admRemovePlayerDto: AdminRemovePlayerDto,
     @Param('id') category_id: number,
   ) {
-    return this.categoriesService.adminRemovePlayer(admRemovePlayerDto, category_id);
+    return this.categoriesService.adminRemovePlayer(
+      admRemovePlayerDto,
+      category_id,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -86,6 +89,4 @@ export class CategoriesController {
   ) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
-
-
 }

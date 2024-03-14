@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AdminCreateScoreDto {
   @ApiProperty()
@@ -49,4 +49,4 @@ export type AdminCreateScoreParams = {
   category_id: number;
   phase_id: number;
   player_id: number;
-}
+};

@@ -9,9 +9,12 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Music } from 'src/musics/entities/music.entity';
 import { Score } from 'src/scores/entities/score.entity';
 
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Phase, Category, Music, Score]), JwtModule, AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Phase, Category, Music, Score]),
+    JwtModule,
+    AuthModule,
+  ],
   controllers: [PhasesController],
   providers: [PhasesService],
 })

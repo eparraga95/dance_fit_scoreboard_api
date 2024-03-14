@@ -8,11 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Event, Player]),
-    AuthModule,
-    JwtModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Event, Player]), AuthModule, JwtModule],
   controllers: [EventsController],
   providers: [EventsService],
 })

@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateMusicDto {
   @ApiProperty()
@@ -13,4 +13,4 @@ export type CreateMusicParams = {
   name: string;
   level: number;
   mode: string;
-}
+};
