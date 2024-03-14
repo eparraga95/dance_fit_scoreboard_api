@@ -21,9 +21,6 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('No Token Found');
     }
 
-    const secretTest = process.env.jwtSecret
-    console.log(secretTest)
-
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.jwtSecret,
