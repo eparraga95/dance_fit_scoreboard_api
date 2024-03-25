@@ -230,6 +230,7 @@ export class EventsService {
         players: true,
         categories: true,
         scores: true,
+        event_type: true
       },
     });
 
