@@ -12,6 +12,7 @@ import { MusicsModule } from './musics/musics.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PhasesModule } from './phases/phases.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { EventTypeModule } from './event_type/event_type.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
     MusicsModule,
     CategoriesModule,
     PhasesModule,
+    EventTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
