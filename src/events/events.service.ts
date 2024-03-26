@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import { Player } from 'src/players/entities/player.entity';
 import { AdminAddPlayerParams } from './dto/adm-add-player.dto';
 import { AdminRemovePlayerParams } from './dto/adm-remove-player.dto';
-import { EventType } from 'src/event_type/entities/event_type.entity';
+import { EventType } from 'src/event_types/entities/event_type.entity';
 
 @Injectable()
 export class EventsService {
