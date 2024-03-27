@@ -219,6 +219,7 @@ export class EventsService {
       relations: {
         categories: true,
         players: true,
+        event_type: true
       },
     });
   }

@@ -1,4 +1,5 @@
 import { Category } from 'src/categories/entities/category.entity';
+import { ComfortLevel } from 'src/comfort_levels/entities/comfort_level.entity';
 import { EventType } from 'src/event_types/entities/event_type.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Score } from 'src/scores/entities/score.entity';
@@ -37,4 +38,7 @@ export class Event {
 
   @ManyToOne(() => EventType, (event_type) => event_type.events)
   event_type: EventType
+
+  @OneToMany(() => ComfortLevel, (comfort_level) => comfort_level.event)
+  comfort_levels: ComfortLevel[]
 }

@@ -25,11 +25,13 @@ export class EventTypeController {
     return this.eventTypeService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEventTypeDto: UpdateEventTypeDto) {
     return this.eventTypeService.update(+id, updateEventTypeDto);
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventTypeService.remove(+id);

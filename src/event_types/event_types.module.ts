@@ -11,4 +11,4 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [EventTypeController],
   providers: [EventTypeService],
 })
-export class EventTypeModule {}
+export class EventTypesModule {}
