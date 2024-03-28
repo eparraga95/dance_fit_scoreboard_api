@@ -274,19 +274,15 @@ export class PhasesService {
         throw new NotFoundException('Music not found');
       }
 
-      if (!phase.musics.some((m) => m.music_id == music_id)) {
+      const musicIndex = phase.musics.findIndex((m) => m.music_id == music_id);
+      if (musicIndex === -1) {
         throw new BadRequestException('Music is not assigned to this Phase');
       }
 
       phase.scores = phase.scores.filter(
         (score) => score.music.music_id !== music_id,
       );
-
-      const musicIndex = phase.musics.findIndex((m) => m.music_id == music_id);
-      if (musicIndex === -1) {
-        throw new BadRequestException('Music is not assigned to this Phase');
-      }
-
+      
       phase.musics.splice(musicIndex, 1);
 
       await this.phaseRepository.save(phase);

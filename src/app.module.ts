@@ -14,6 +14,7 @@ import { PhasesModule } from './phases/phases.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { EventTypesModule } from './event_types/event_types.module';
 import { ComfortLevelsModule } from './comfort_levels/comfort_levels.module';
+import { SongListsModule } from './song_lists/song_lists.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ComfortLevelsModule } from './comfort_levels/comfort_levels.module';
     PhasesModule,
     EventTypesModule,
     ComfortLevelsModule,
+    SongListsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -65,13 +65,13 @@ export class Score {
   event: Event;
 
   @ManyToOne(() => Category, (category) => category.scores, {
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE', nullable: true
   })
   category: Category;
 
   @ManyToOne(() => Music, (music) => music.scores, { onDelete: 'CASCADE' })
   music: Music;
 
-  @ManyToOne(() => Phase, (phase) => phase.scores, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Phase, (phase) => phase.scores, { onDelete: 'CASCADE', nullable: true})
   phase: Phase;
 }

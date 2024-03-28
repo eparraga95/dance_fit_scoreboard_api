@@ -1,14 +1,18 @@
 import { Category } from 'src/categories/entities/category.entity';
 import { ComfortLevel } from 'src/comfort_levels/entities/comfort_level.entity';
 import { EventType } from 'src/event_types/entities/event_type.entity';
+import { Music } from 'src/musics/entities/music.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Score } from 'src/scores/entities/score.entity';
+import { SongList } from 'src/song_lists/entities/song_list.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -41,4 +45,8 @@ export class Event {
 
   @OneToMany(() => ComfortLevel, (comfort_level) => comfort_level.event)
   comfort_levels: ComfortLevel[]
+
+  @OneToOne(() => SongList, (song_list) => song_list.event)
+  @JoinColumn()
+  song_list: SongList
 }

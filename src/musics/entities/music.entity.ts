@@ -1,5 +1,6 @@
 import { Phase } from 'src/phases/entities/phase.entity';
 import { Score } from 'src/scores/entities/score.entity';
+import { SongList } from 'src/song_lists/entities/song_list.entity';
 import {
   Column,
   Entity,
@@ -31,4 +32,9 @@ export class Music {
 
   @ManyToMany(() => Phase, (phase) => phase.musics, { onDelete: 'CASCADE' })
   phases: Phase[];
+
+  @ManyToMany(() => SongList, (song_list) => song_list.musics, {
+    onDelete: 'CASCADE',
+  })
+  song_lists: SongList[];
 }
