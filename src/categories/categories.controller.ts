@@ -1,4 +1,3 @@
-import { AddMusicDto } from '../phases/dto/add-music.dto';
 import {
   Controller,
   Get,
@@ -13,10 +12,10 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { AdminAddPlayerDto } from './dto/adm-add-player.dto';
+import { AdminRemovePlayerDto } from './dto/adm-remove-player.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
-import { RemoveMusicDto } from '../phases/dto/remove-music.dto';
-import { adminAddPlayerDto } from './dto/adm-add-player.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -44,11 +43,11 @@ export class CategoriesController {
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
   }
-  
+
   @UseGuards(AdminGuard, AuthGuard)
   @Patch(':id/admin/add_player')
   adminAddPlayer(
-    @Body() admAddPlayerDto: adminAddPlayerDto,
+    @Body() admAddPlayerDto: AdminAddPlayerDto,
     @Param('id') category_id: number,
   ) {
     return this.categoriesService.adminAddPlayer(admAddPlayerDto, category_id);
@@ -57,10 +56,13 @@ export class CategoriesController {
   @UseGuards(AdminGuard, AuthGuard)
   @Patch(':id/admin/remove_player')
   adminRemovePlayer(
-    @Body() admRemovePlayerDto: adminAddPlayerDto,
+    @Body() admRemovePlayerDto: AdminRemovePlayerDto,
     @Param('id') category_id: number,
   ) {
-    return this.categoriesService.adminRemovePlayer(admRemovePlayerDto, category_id);
+    return this.categoriesService.adminRemovePlayer(
+      admRemovePlayerDto,
+      category_id,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -87,6 +89,4 @@ export class CategoriesController {
   ) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
-
-
 }

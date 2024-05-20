@@ -10,19 +10,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './entities/event.entity';
 import { Repository } from 'typeorm';
 import { Player } from 'src/players/entities/player.entity';
-import { adminAddPlayerParams } from './dto/adm-add-player.dto';
-import { adminRemovePlayerParams } from './dto/adm-remove-player.dto';
+import { AdminAddPlayerParams } from './dto/adm-add-player.dto';
+import { AdminRemovePlayerParams } from './dto/adm-remove-player.dto';
+import { EventType } from 'src/event_types/entities/event_type.entity';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event) private eventRepository: Repository<Event>,
     @InjectRepository(Player) private playerRepository: Repository<Player>,
+    @InjectRepository(EventType) private eventTypeRepository: Repository<EventType>
   ) {}
 
   async create(createEventDetails: CreateEventParams) {
     try {
-      const { name } = createEventDetails;
+      const { name, status, event_type_id } = createEventDetails;
 
       if (!name) {
         throw new BadRequestException('Invalid event details');
@@ -31,13 +33,28 @@ export class EventsService {
       const sameNameEvent = await this.eventRepository.findOne({
         where: { name },
       });
+
       if (sameNameEvent) {
         throw new BadRequestException(
           'An event with the same name already exists',
         );
       }
 
-      const newEvent = this.eventRepository.create(createEventDetails);
+      const eventType = await this.eventTypeRepository.findOne({
+        where: {
+          event_type_id: event_type_id
+        }
+      })
+
+      if (!eventType) {
+        throw new NotFoundException('Event type not found')
+      }
+
+      const newEvent = this.eventRepository.create({
+        name: name,
+        status: status,
+        event_type: eventType
+      });
 
       return await this.eventRepository.save(newEvent);
     } catch (error) {
@@ -81,7 +98,7 @@ export class EventsService {
   }
 
   async adminAddPlayer(
-    adminAddPlayerDetails: adminAddPlayerParams,
+    adminAddPlayerDetails: AdminAddPlayerParams,
     event_id: number,
   ) {
     try {
@@ -156,7 +173,7 @@ export class EventsService {
   }
 
   async adminRemovePlayer(
-    adminRemovePlayerDetails: adminRemovePlayerParams,
+    adminRemovePlayerDetails: AdminRemovePlayerParams,
     event_id: number,
   ) {
     try {
@@ -202,6 +219,7 @@ export class EventsService {
       relations: {
         categories: true,
         players: true,
+        event_type: true
       },
     });
   }
@@ -213,6 +231,7 @@ export class EventsService {
         players: true,
         categories: true,
         scores: true,
+        event_type: true
       },
     });
 

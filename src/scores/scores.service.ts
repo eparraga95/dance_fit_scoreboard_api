@@ -14,7 +14,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Phase } from 'src/phases/entities/phase.entity';
-import { adminCreateScoreParams } from './dto/adm-create-score.dto';
+import { AdminCreateScoreParams } from './dto/adm-create-score.dto';
 
 @Injectable()
 export class ScoresService {
@@ -167,10 +167,10 @@ export class ScoresService {
     }
   }
 
-  async adminCreate(scoreDetails: adminCreateScoreParams) {
+  async adminCreate(adminCreateScoreDetails: AdminCreateScoreParams) {
     try {
       const { player_id, event_id, music_id, category_id, phase_id } =
-        scoreDetails;
+        adminCreateScoreDetails;
 
       const player = await this.playerRepository.findOne({
         where: { player_id: player_id },
@@ -271,7 +271,7 @@ export class ScoresService {
         miss,
         max_combo,
         stage_pass,
-      } = scoreDetails;
+      } = adminCreateScoreDetails;
 
       const total_notes = perfect + great + good + bad + miss;
 
@@ -371,7 +371,9 @@ export class ScoresService {
         throw new NotFoundException('Score not found');
       }
 
-      const deletionResult = await this.scoreRepository.delete({score_id: score.score_id});
+      const deletionResult = await this.scoreRepository.delete({
+        score_id: score.score_id,
+      });
 
       if (deletionResult.affected === 0) {
         throw new InternalServerErrorException('Failed to delete score');

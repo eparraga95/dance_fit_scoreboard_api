@@ -1,16 +1,15 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Score } from 'src/scores/entities/score.entity';
 import { Event } from 'src/events/entities/event.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { ComfortLevel } from 'src/comfort_levels/entities/comfort_level.entity';
 
 @Entity({ name: 'players' })
 export class Player {
@@ -41,4 +40,7 @@ export class Player {
   @ManyToMany(() => Category, (category) => category.players, { cascade: true })
   @JoinTable()
   categories: Category[];
+
+  @OneToMany(() => ComfortLevel, (comfort_level) => comfort_level.player)
+  comfort_levels: ComfortLevel[]
 }

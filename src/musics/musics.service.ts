@@ -4,11 +4,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateMusicDto } from './dto/create-music.dto';
-import { UpdateMusicDto } from './dto/update-music.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Music } from './entities/music.entity';
 import { Not, Repository } from 'typeorm';
+import { CreateMusicParams } from './dto/create-music.dto';
+import { UpdateMusicParams } from './dto/update-music.dto';
 
 @Injectable()
 export class MusicsService {
@@ -16,9 +16,9 @@ export class MusicsService {
     @InjectRepository(Music) private musicRepository: Repository<Music>,
   ) {}
 
-  async create(createMusicDto: CreateMusicDto) {
+  async create(createMusicDetails: CreateMusicParams) {
     try {
-      const { name, level, mode } = createMusicDto;
+      const { name, level, mode } = createMusicDetails;
 
       const modes = ['single', 'double'];
       if (!modes.includes(mode)) {
@@ -28,13 +28,14 @@ export class MusicsService {
       const identicalMusic = await this.musicRepository.findOne({
         where: { name: name, level: level, mode: mode },
       });
+
       if (identicalMusic) {
         throw new BadRequestException(
           'Music with exact same data already exists',
         );
       }
 
-      const newMusic = this.musicRepository.create({ ...createMusicDto });
+      const newMusic = this.musicRepository.create({ ...createMusicDetails });
       return await this.musicRepository.save(newMusic);
     } catch (error) {
       console.error('Error creating music:', error);
@@ -58,7 +59,7 @@ export class MusicsService {
     return music;
   }
 
-  async update(music_id: number, updateMusicDto: UpdateMusicDto) {
+  async update(music_id: number, updateMusicDetails: UpdateMusicParams) {
     try {
       const musicToUpdate = await this.musicRepository.findOne({
         where: { music_id: music_id },
@@ -70,7 +71,7 @@ export class MusicsService {
 
       const potentialUpdatedMusic = this.musicRepository.create({
         ...musicToUpdate,
-        ...updateMusicDto,
+        ...updateMusicDetails,
       });
 
       const potentialMusicDuplicate = await this.musicRepository.findOne({
@@ -92,7 +93,7 @@ export class MusicsService {
         {
           music_id: music_id,
         },
-        { ...updateMusicDto },
+        { ...updateMusicDetails },
       );
 
       if (updateResult.affected === 0) {

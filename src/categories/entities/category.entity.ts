@@ -32,7 +32,7 @@ export class Category {
   @JoinColumn()
   scores: Score[];
 
-  @ManyToOne(() => Event, (event) => event.categories, { onDelete: 'CASCADE'})
+  @ManyToOne(() => Event, (event) => event.categories, { onDelete: 'CASCADE' })
   event: Event;
 
   @ManyToMany(() => Player, (player) => player.categories)

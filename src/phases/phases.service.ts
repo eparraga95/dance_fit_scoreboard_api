@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePhaseParams } from './dto/create-phase.dto';
-import { UpdatePhaseDto, UpdatePhaseParams } from './dto/update-phase.dto';
+import { UpdatePhaseParams } from './dto/update-phase.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Phase } from './entities/phase.entity';
 import { Repository } from 'typeorm';
@@ -274,19 +274,15 @@ export class PhasesService {
         throw new NotFoundException('Music not found');
       }
 
-      if (!phase.musics.some((m) => m.music_id == music_id)) {
+      const musicIndex = phase.musics.findIndex((m) => m.music_id == music_id);
+      if (musicIndex === -1) {
         throw new BadRequestException('Music is not assigned to this Phase');
       }
 
       phase.scores = phase.scores.filter(
         (score) => score.music.music_id !== music_id,
       );
-
-      const musicIndex = phase.musics.findIndex((m) => m.music_id == music_id);
-      if (musicIndex === -1) {
-        throw new BadRequestException('Music is not assigned to this Phase');
-      }
-
+      
       phase.musics.splice(musicIndex, 1);
 
       await this.phaseRepository.save(phase);
@@ -299,7 +295,7 @@ export class PhasesService {
         },
       });
 
-      const deletionResult = await this.scoreRepository.remove(scoresToDelete);
+      await this.scoreRepository.remove(scoresToDelete);
 
       return phase;
     } catch (error) {

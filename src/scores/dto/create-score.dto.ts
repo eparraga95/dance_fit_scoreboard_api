@@ -1,20 +1,34 @@
-import { Player } from 'src/players/entities/player.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateScoreDto {
+  @ApiProperty()
   value: number;
+  @ApiProperty()
   perfect: number;
+  @ApiProperty()
   great: number;
+  @ApiProperty()
   good: number;
+  @ApiProperty()
   bad: number;
+  @ApiProperty()
   miss: number;
+  @ApiProperty()
   max_combo: number;
+  @ApiProperty()
   stage_pass: boolean;
+  @ApiProperty()
   grade: string;
+  @ApiProperty()
   plate: string;
+  @ApiProperty()
   event_id: number;
+  @ApiProperty()
   music_id: number;
+  @ApiProperty()
   category_id: number;
-  phase_id: number
+  @ApiProperty()
+  phase_id: number;
 }
 
 export type CreateScoreParams = {

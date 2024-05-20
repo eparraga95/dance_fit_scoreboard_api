@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PhasesService } from './phases.service';
 import { CreatePhaseDto } from './dto/create-phase.dto';
 import { UpdatePhaseDto } from './dto/update-phase.dto';
@@ -10,7 +19,6 @@ import { RemoveMusicDto } from './dto/remove-music.dto';
 @Controller('phases')
 export class PhasesController {
   constructor(private readonly phasesService: PhasesService) {}
-
 
   @UseGuards(AuthGuard, AdminGuard)
   @Post()
@@ -45,13 +53,15 @@ export class PhasesController {
   @UseGuards(AuthGuard, AdminGuard)
   @Patch('/:id/add_music')
   addMusic(@Body() addMusicDto: AddMusicDto, @Param('id') phase_id: number) {
-    return this.phasesService.addMusic(phase_id, addMusicDto)
+    return this.phasesService.addMusic(phase_id, addMusicDto);
   }
 
   @UseGuards(AuthGuard, AdminGuard)
   @Patch('/:id/remove_music')
-  removeMusic(@Body() removeMusicDto: RemoveMusicDto, @Param('id') phase_id: number) {
-    return this.phasesService.removeMusic(phase_id, removeMusicDto)
+  removeMusic(
+    @Body() removeMusicDto: RemoveMusicDto,
+    @Param('id') phase_id: number,
+  ) {
+    return this.phasesService.removeMusic(phase_id, removeMusicDto);
   }
-
 }

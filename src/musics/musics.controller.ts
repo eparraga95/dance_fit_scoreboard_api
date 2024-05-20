@@ -14,7 +14,6 @@ import { UpdateMusicDto } from './dto/update-music.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
 
-
 @Controller('musics')
 export class MusicsController {
   constructor(private readonly musicsService: MusicsService) {}

@@ -14,7 +14,7 @@ import { CreateScoreDto } from './dto/create-score.dto';
 import { UpdateScoreDto } from './dto/update-score.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
-import { adminCreateScoreDto, adminCreateScoreParams } from './dto/adm-create-score.dto';
+import { AdminCreateScoreDto } from './dto/adm-create-score.dto';
 
 @Controller('scores')
 export class ScoresController {
@@ -30,8 +30,8 @@ export class ScoresController {
 
   @UseGuards(AdminGuard, AuthGuard)
   @Post('/admin')
-  adminCreate(@Body()  admCreateScoreDto: adminCreateScoreDto) {
-    return this.scoresService.adminCreate(admCreateScoreDto)
+  adminCreate(@Body() admCreateScoreDto: AdminCreateScoreDto) {
+    return this.scoresService.adminCreate(admCreateScoreDto);
   }
 
   @Get()

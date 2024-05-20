@@ -1,16 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { loginDto } from './dto/login.dto';
-import { AuthGuard } from './auth.guard';
-import { AdminGuard } from './admin.guard';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/login')
-  async login(@Body() loginDto: loginDto) {
+  async login(@Body() loginDto: LoginDto) {
     return this.authService.signIn(loginDto);
   }
-
 }

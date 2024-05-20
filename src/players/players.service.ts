@@ -10,7 +10,7 @@ import { Player } from './entities/player.entity';
 import { Repository } from 'typeorm';
 import { CreatePlayerParams } from './dto/create-player.dto';
 import { S3Service } from 'src/aws/s3.service';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PlayersService {
@@ -19,28 +19,28 @@ export class PlayersService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async create(playerDetails: CreatePlayerParams) {
+  async create(createPlayerDetails: CreatePlayerParams) {
     try {
-      const { nickname, password, confirmPassword } = playerDetails;
+      const { nickname, password, confirmPassword } = createPlayerDetails;
 
       const existingNickname = await this.playerRepository.findOne({
         where: {
-          nickname: nickname
-        }
-      })
+          nickname: nickname,
+        },
+      });
 
       if (existingNickname) {
-        throw new BadRequestException("Nickname already in use")
+        throw new BadRequestException('Nickname already in use');
       }
 
       if (password != confirmPassword) {
         throw new BadRequestException('Passwords must match');
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10)
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newPlayer = this.playerRepository.create({
-        ...playerDetails,
+        ...createPlayerDetails,
         password: hashedPassword,
         role: 'player',
       });

@@ -48,7 +48,7 @@ export class Score {
   @Column()
   grade: string;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   plate: string;
 
   @Column({ default: false })
@@ -64,12 +64,14 @@ export class Score {
   @ManyToOne(() => Event, (event) => event.scores, { onDelete: 'CASCADE' })
   event: Event;
 
-  @ManyToOne(() => Category, (category) => category.scores, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, (category) => category.scores, {
+    onDelete: 'CASCADE', nullable: true
+  })
   category: Category;
 
   @ManyToOne(() => Music, (music) => music.scores, { onDelete: 'CASCADE' })
   music: Music;
 
-  @ManyToOne(() => Phase, (phase) => phase.scores, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Phase, (phase) => phase.scores, { onDelete: 'CASCADE', nullable: true})
   phase: Phase;
 }

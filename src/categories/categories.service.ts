@@ -12,8 +12,8 @@ import { Repository } from 'typeorm';
 import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Player } from 'src/players/entities/player.entity';
-import { adminAddPlayerParams } from './dto/adm-add-player.dto';
-import { adminRemovePlayerParams } from './dto/adm-remove-player.dto';
+import { AdminAddPlayerParams } from './dto/adm-add-player.dto';
+import { AdminRemovePlayerParams } from './dto/adm-remove-player.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -182,7 +182,7 @@ export class CategoriesService {
   }
 
   async adminAddPlayer(
-    adminAddPlayerDetails: adminAddPlayerParams,
+    adminAddPlayerDetails: AdminAddPlayerParams,
     category_id: number,
   ) {
     try {
@@ -262,7 +262,7 @@ export class CategoriesService {
   }
 
   async adminRemovePlayer(
-    adminRemovePlayerDetails: adminRemovePlayerParams,
+    adminRemovePlayerDetails: AdminRemovePlayerParams,
     category_id: number,
   ) {
     try {
