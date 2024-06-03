@@ -13,13 +13,17 @@ import { Player } from 'src/players/entities/player.entity';
 import { AdminAddPlayerParams } from './dto/adm-add-player.dto';
 import { AdminRemovePlayerParams } from './dto/adm-remove-player.dto';
 import { EventType } from 'src/event_types/entities/event_type.entity';
+import { SongList } from 'src/song_lists/entities/song_list.entity';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event) private eventRepository: Repository<Event>,
     @InjectRepository(Player) private playerRepository: Repository<Player>,
-    @InjectRepository(EventType) private eventTypeRepository: Repository<EventType>
+    @InjectRepository(EventType)
+    private eventTypeRepository: Repository<EventType>,
+    @InjectRepository(SongList)
+    private songListRepository: Repository<SongList>,
   ) {}
 
   async create(createEventDetails: CreateEventParams) {
@@ -42,18 +46,23 @@ export class EventsService {
 
       const eventType = await this.eventTypeRepository.findOne({
         where: {
-          event_type_id: event_type_id
-        }
-      })
+          event_type_id: event_type_id,
+        },
+      });
 
       if (!eventType) {
-        throw new NotFoundException('Event type not found')
+        throw new NotFoundException('Event type not found');
       }
+
+      const newSongList = this.songListRepository.create();
+
+      await this.songListRepository.save(newSongList);
 
       const newEvent = this.eventRepository.create({
         name: name,
         status: status,
-        event_type: eventType
+        event_type: eventType,
+        song_list: newSongList,
       });
 
       return await this.eventRepository.save(newEvent);
@@ -219,7 +228,7 @@ export class EventsService {
       relations: {
         categories: true,
         players: true,
-        event_type: true
+        event_type: true,
       },
     });
   }
@@ -231,7 +240,8 @@ export class EventsService {
         players: true,
         categories: true,
         scores: true,
-        event_type: true
+        event_type: true,
+        song_list: true,
       },
     });
 

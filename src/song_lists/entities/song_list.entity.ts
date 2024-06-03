@@ -20,6 +20,7 @@ export class SongList {
   @JoinTable()
   musics: Music[];
 
-  @OneToOne(() => Event, (event) => event.song_list, { nullable: true })
+  @OneToOne(() => Event, (event) => event.song_list, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn()
   event: Event;
 }

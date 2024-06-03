@@ -24,31 +24,6 @@ export class SongListsService {
     @InjectRepository(Score) private scoreRepository: Repository<Score>,
   ) {}
 
-  async create(createSongListDetails: CreateSongListParams) {
-    try {
-      const { event_id } = createSongListDetails;
-
-      const event = await this.eventRepository.findOne({
-        where: {
-          event_id: event_id,
-        },
-      });
-
-      if (!event) {
-        throw new NotFoundException('Event not found');
-      }
-
-      const newSongList = this.songListRepository.create();
-
-      newSongList.event = event;
-
-      return await this.songListRepository.save(newSongList);
-    } catch (error) {
-      console.error('Error create song list:', error);
-      throw error;
-    }
-  }
-
   async findAll() {
     return await this.songListRepository.find({
       relations: {
