@@ -10,12 +10,6 @@ import { AdminGuard } from 'src/auth/admin.guard';
 export class SongListsController {
   constructor(private readonly songListsService: SongListsService) {}
 
-  @UseGuards(AuthGuard, AdminGuard)
-  @Post()
-  create(@Body() createSongListDto: CreateSongListDto) {
-    return this.songListsService.create(createSongListDto);
-  }
-
   @Get()
   findAll() {
     return this.songListsService.findAll();

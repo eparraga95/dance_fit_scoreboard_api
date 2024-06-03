@@ -47,6 +47,5 @@ export class Event {
   comfort_levels: ComfortLevel[]
 
   @OneToOne(() => SongList, (song_list) => song_list.event)
-  @JoinColumn()
   song_list: SongList
 }
