@@ -28,7 +28,8 @@ export class ComfortLevelsService {
 
   async create(createComfortLevelDetails: CreateComfortLevelParams) {
     try {
-      const { player_id, event_id } = createComfortLevelDetails;
+      const { player_id, event_id, level_single, level_double } =
+        createComfortLevelDetails;
 
       const player = await this.playerRepository.findOne({
         where: {
@@ -50,12 +51,13 @@ export class ComfortLevelsService {
         throw new NotFoundException('Event not found');
       }
 
-      const newComfortLevel = this.comfortLevelRepository.create(
-        createComfortLevelDetails
-      );
+      const newComfortLevel = this.comfortLevelRepository.create({
+        level_double: level_double,
+        level_single: level_single
+      });
 
-      newComfortLevel.player = player
-      newComfortLevel.event = event
+      newComfortLevel.player = player;
+      newComfortLevel.event = event;
 
       return await this.comfortLevelRepository.save(newComfortLevel);
     } catch (error) {
@@ -83,10 +85,10 @@ export class ComfortLevelsService {
     });
 
     if (!comfortLevel) {
-      throw new NotFoundException('Comfort level not found')
+      throw new NotFoundException('Comfort level not found');
     }
 
-    return comfortLevel
+    return comfortLevel;
   }
 
   async update(
@@ -125,8 +127,8 @@ export class ComfortLevelsService {
         },
         relations: {
           player: true,
-          event: true
-        }
+          event: true,
+        },
       });
     } catch (error) {
       console.error('Error updating comfort level:', error);
