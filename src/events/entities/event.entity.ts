@@ -1,14 +1,13 @@
 import { Category } from 'src/categories/entities/category.entity';
 import { ComfortLevel } from 'src/comfort_levels/entities/comfort_level.entity';
+import { Enrollment } from 'src/enrollments/entities/enrollment.entity';
 import { EventType } from 'src/event_types/entities/event_type.entity';
-import { Music } from 'src/musics/entities/music.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Score } from 'src/scores/entities/score.entity';
 import { SongList } from 'src/song_lists/entities/song_list.entity';
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -48,4 +47,7 @@ export class Event {
 
   @OneToOne(() => SongList, (song_list) => song_list.event)
   song_list: SongList
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.event)
+  enrollments: Enrollment[]
 }
