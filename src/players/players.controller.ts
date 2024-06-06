@@ -69,13 +69,13 @@ export class PlayersController {
   findAll() {
     return this.playersService.findAll();
   }
-
+  
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.playersService.findOne(+id);
   }
-
+  
   @UseGuards(AuthGuard, AdminGuard)
   @Patch(':id')
   update(

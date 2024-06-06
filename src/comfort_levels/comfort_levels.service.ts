@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -16,6 +17,7 @@ import { Player } from 'src/players/entities/player.entity';
 import { Repository } from 'typeorm';
 import { Event } from 'src/events/entities/event.entity';
 import { ComfortLevel } from './entities/comfort_level.entity';
+
 
 @Injectable()
 export class ComfortLevelsService {
@@ -53,7 +55,7 @@ export class ComfortLevelsService {
 
       const newComfortLevel = this.comfortLevelRepository.create({
         level_double: level_double,
-        level_single: level_single
+        level_single: level_single,
       });
 
       newComfortLevel.player = player;
@@ -89,6 +91,64 @@ export class ComfortLevelsService {
     }
 
     return comfortLevel;
+  }
+
+  async findOneByEventPlayer(
+    event_id: number,
+    player_id: number
+  ) {
+    try {
+
+      console.log(event_id, player_id)
+      const player = await this.playerRepository.findOne({
+        where: {
+          player_id: player_id,
+        },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Player not found');
+      }
+
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+        relations: {
+          players: true,
+        },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      if (!event.players.some((player) => player.player_id == player_id)) {
+        throw new BadRequestException(
+          'Player is not a participant in this event',
+        );
+      }
+
+      const eventPlayerComfortLevel = await this.comfortLevelRepository.findOne(
+        {
+          where: {
+            player: player,
+            event: event,
+          },
+        },
+      );
+
+      if (!eventPlayerComfortLevel) {
+        throw new NotFoundException(
+          'Comfort level for this player in this event not found',
+        );
+      }
+
+      return eventPlayerComfortLevel;
+    } catch (error) {
+      console.error('Error finding comfort levels', error);
+      throw error;
+    }
   }
 
   async update(
