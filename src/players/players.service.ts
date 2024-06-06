@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { CreatePlayerParams } from './dto/create-player.dto';
 import { S3Service } from 'src/aws/s3.service';
 import * as bcrypt from 'bcrypt';
+import { ComfortLevel } from 'src/comfort_levels/entities/comfort_level.entity';
 
 @Injectable()
 export class PlayersService {
@@ -77,6 +78,7 @@ export class PlayersService {
 
     return safePlayer;
   }
+
 
   async update(player_id: number, updatePlayerDetails: UpdatePlayerParams) {
     try {
