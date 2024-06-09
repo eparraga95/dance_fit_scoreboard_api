@@ -94,6 +94,18 @@ export class ScoresController {
   }
 
   @UseGuards(AdminGuard, AuthGuard)
+  @Post('/admin/validate/:score_id')
+  adminValidateScore(@Param('score_id') score_id: string) {
+    return this.scoresService.adminValidateScore(+score_id)
+  }
+
+  @UseGuards(AdminGuard, AuthGuard)
+  @Delete('/admin/invalidate/:score_id')
+  adminInvalidateScore(@Param('score_id') score_id: string) {
+    return this.scoresService.adminInvalidateScore(+score_id)
+  }
+
+  @UseGuards(AdminGuard, AuthGuard)
   @Post('/admin')
   adminCreate(@Body() admCreateScoreDto: AdminCreateScoreDto) {
     return this.scoresService.adminCreate(admCreateScoreDto);

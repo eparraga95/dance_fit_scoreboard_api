@@ -51,9 +51,6 @@ export class ScoresService {
 
       const event = await this.eventRepository.findOne({
         where: { event_id: event_id },
-        relations: {
-          categories: true,
-        },
       });
 
       if (!event) throw new NotFoundException('Event not Found');
@@ -72,17 +69,6 @@ export class ScoresService {
         throw new NotFoundException('Music not found');
       }
 
-      // look for an already validated score with same MEP
-
-      const validatedScore = await this.scoreRepository.findOne({
-        where: {
-          player: player,
-          event: event,
-          music: music,
-          validated: true
-        }
-      })
-
       const pendingScore = await this.scoreRepository.findOne({
         where: {
           player: player,
@@ -93,7 +79,11 @@ export class ScoresService {
       })
 
       if (pendingScore) {
-        throw new BadRequestException("There is already a Score submission waiting for administration approval, wait for the administration to approve it before sending a new score with same MEP")
+        // delete pending score
+        await this.scoreRepository.remove(pendingScore)
+
+        // remove old score picture upload from s3
+        await this.s3Service.deleteFile('dancefitscoreboardbucket', pendingScore.score_picture)
       }
 
       const fileName = `scorepic_m${music.music_id}_e${event.event_id}_p${player.player_id}.${mimeType.split('/')[1]}`
@@ -146,6 +136,76 @@ export class ScoresService {
     } catch (error) {
       console.error('Error creating score:', error);
       throw error;
+    }
+  }
+
+  async adminValidateScore (score_id: number) {
+    try {
+
+      const scoreToValidate = await this.scoreRepository.findOne({
+        where: {
+          score_id: score_id
+        },
+        relations: {
+          player: true,
+          event: true,
+          music: true
+        }
+      })
+
+      console.log(scoreToValidate)
+
+      const fileName = scoreToValidate.score_picture.split('/').pop()
+
+      // delete score_picture from aws s3 bucket
+      await this.s3Service.deleteFile('dancefitscoreboardbucket', fileName)
+
+      const oldValidatedScore = await this.scoreRepository.findOne({
+        where: {
+          music: scoreToValidate.music,
+          event: scoreToValidate.event,
+          player: scoreToValidate.player,
+          validated: true
+        }
+      })
+
+      console.log(oldValidatedScore)
+
+      if (oldValidatedScore) {
+        await this.scoreRepository.remove(oldValidatedScore)
+      }
+
+      await this.scoreRepository.update(scoreToValidate, {
+        validated: true,
+        score_picture: null
+      })
+
+      return { message: "Score validated successfully"}
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async adminInvalidateScore (score_id: number) {
+    try {
+
+      const scoreToInvalidate = await this.scoreRepository.findOne({
+        where: {
+          score_id: score_id
+        }
+      })
+
+      const fileName = scoreToInvalidate.score_picture.split('/').pop()
+
+      await this.s3Service.deleteFile('dancefitscoreboardbucket', fileName)
+
+      await this.scoreRepository.remove(scoreToInvalidate)
+
+      return { message: 'Score invalidated and deleted succesfully'}
+
+    } catch (error) {
+      throw error
     }
   }
 
@@ -279,9 +339,6 @@ export class ScoresService {
 
       return await this.scoreRepository.save(newScore);
 
-      if (!player) {
-        throw new NotFoundException('Player not found');
-      }
     } catch (error) {}
   }
 
@@ -330,10 +387,13 @@ export class ScoresService {
       const scores = await this.scoreRepository.find({
         where: {
           event: event,
+          validated: true
         },
         relations: {
           player: true,
+          music: true
         },
+        
       });
 
       return scores;
