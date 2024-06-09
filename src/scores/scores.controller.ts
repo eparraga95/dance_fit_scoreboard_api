@@ -68,7 +68,7 @@ export class ScoresController {
       music_id: Number(req.body.music_id),
       plate: req.body.plate,
       grade: req.body.grade,
-      stage_pass: Boolean(req.body.stage_pass),
+      stage_pass: req.body.stage_pass === 'true' ? true : false,
       max_combo: Number(req.body.max_combo),
       miss: Number(req.body.miss),
       bad: Number(req.body.bad),
