@@ -23,7 +23,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CustomUploadFileTypeValidator } from 'src/app.validators';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 8 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png'];
+const VALID_UPLOADS_MIME_TYPES = [
+  'image/jpeg', 
+  'image/png', 
+  'image/heic', 
+  'image/gif', 
+  'image/bmp', 
+  'image/tiff', 
+  'image/webp', 
+  'image/svg+xml'
+];
+
 
 @Controller('players')
 export class PlayersController {
