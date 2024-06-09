@@ -8,6 +8,10 @@ import {
   Delete,
   UseGuards,
   Req,
+  UploadedFile,
+  ParseFilePipeBuilder,
+  HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ScoresService } from './scores.service';
 import { CreateScoreDto } from './dto/create-score.dto';
@@ -15,6 +19,12 @@ import { UpdateScoreDto } from './dto/update-score.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { AdminCreateScoreDto } from './dto/adm-create-score.dto';
+import { CustomUploadFileTypeValidator } from 'src/app.validators';
+import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+const MAX_SCORE_PICTURE_SIZE_IN_BYTES = 8 * 1024 * 1024;
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png'];
 
 @Controller('scores')
 export class ScoresController {
@@ -22,10 +32,56 @@ export class ScoresController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Req() { user }, @Body() createScoreDto: CreateScoreDto) {
-    const { player_id } = user;
+  @UseInterceptors(FileInterceptor('file'))
+  create(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addValidator(
+          new CustomUploadFileTypeValidator({
+            fileType: VALID_UPLOADS_MIME_TYPES,
+          }),
+        )
+        .addMaxSizeValidator({
+          maxSize: MAX_SCORE_PICTURE_SIZE_IN_BYTES,
+        })
+        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+    )
+    file: Express.Multer.File,
+    @Req() req: Request,
+  ) {
+    
+    console.log(req.body)
+    const { player } = req
+    const { player_id } = player
+    
+    const createScoreDto: CreateScoreDto = {
+      event_id: Number(req.body.event_id),
+      music_id: Number(req.body.music_id),
+      plate: req.body.plate,
+      grade: req.body.grade,
+      stage_pass: Boolean(req.body.stage_pass),
+      max_combo: Number(req.body.max_combo),
+      miss: Number(req.body.miss),
+      bad: Number(req.body.bad),
+      good: Number(req.body.good),
+      great: Number(req.body.great),
+      perfect: Number(req.body.perfect),
+      value: Number(req.body.value),
+    }
 
-    return this.scoresService.create(player_id, createScoreDto);
+    console.log(createScoreDto)
+
+    console.log(file)
+
+    const buffer = Buffer.from(file.buffer);
+    const mimeType = file.mimetype;
+
+    return this.scoresService.create(
+      Number(player_id),
+      createScoreDto,
+      buffer,
+      mimeType,
+    );
   }
 
   @UseGuards(AdminGuard, AuthGuard)
@@ -42,6 +98,16 @@ export class ScoresController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.scoresService.findOne(+id);
+  }
+
+  @Get('events/:event_id')
+  findByEvent(@Param('event_id') event_id: string) {
+    return this.scoresService.findByEvent(+event_id);
+  }
+
+  @Get('events/:event_id/pending')
+  findPendingByEvent(@Param('event_id') event_id: string) {
+    return this.scoresService.findPendingByEvent(+event_id)
   }
 
   @UseGuards(AuthGuard, AdminGuard)

@@ -10,6 +10,7 @@ import { Event } from 'src/events/entities/event.entity';
 import { Music } from 'src/musics/entities/music.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Phase } from 'src/phases/entities/phase.entity';
+import { S3Service } from 'src/aws/s3.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { Phase } from 'src/phases/entities/phase.entity';
     JwtModule,
   ],
   controllers: [ScoresController],
-  providers: [ScoresService],
+  providers: [ScoresService, S3Service],
 })
 export class ScoresModule {}

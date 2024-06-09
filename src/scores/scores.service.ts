@@ -1,3 +1,4 @@
+import { S3Service } from 'src/aws/s3.service';
 import {
   BadRequestException,
   Injectable,
@@ -27,9 +28,15 @@ export class ScoresService {
     private categoryRepository: Repository<Category>,
     @InjectRepository(Phase)
     private phaseRepository: Repository<Phase>,
+    private readonly s3Service: S3Service,
   ) {}
 
-  async create(player_id: number, scoreDetails: CreateScoreParams) {
+  async create(
+    player_id: number,
+    scoreDetails: CreateScoreParams,
+    imageBuffer: Buffer,
+    mimeType: string,
+  ) {
     try {
       const player = await this.playerRepository.findOne({
         where: { player_id: player_id },
@@ -40,7 +47,7 @@ export class ScoresService {
         throw new NotFoundException('Player not found');
       }
 
-      const { event_id, music_id, category_id, phase_id } = scoreDetails;
+      const { event_id, music_id } = scoreDetails;
 
       const event = await this.eventRepository.findOne({
         where: { event_id: event_id },
@@ -57,12 +64,6 @@ export class ScoresService {
         );
       }
 
-      if (!event.categories.some((c) => c.category_id == category_id)) {
-        throw new BadRequestException(
-          'This Category is not assigned to this Event',
-        );
-      }
-
       const music = await this.musicRepository.findOne({
         where: { music_id: music_id },
       });
@@ -71,59 +72,41 @@ export class ScoresService {
         throw new NotFoundException('Music not found');
       }
 
-      const category = await this.categoryRepository.findOne({
-        where: {
-          category_id: category_id,
-        },
-        relations: {
-          players: true,
-        },
-      });
+      // look for an already validated score with same MEP
 
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
-
-      if (!category.players.some((p) => p.nickname === player.nickname)) {
-        throw new BadRequestException(
-          'Player is not assigned to this Category in this Event',
-        );
-      }
-
-      const phase = await this.phaseRepository.findOne({
-        where: {
-          phase_id: phase_id,
-        },
-        relations: {
-          musics: true,
-        },
-      });
-
-      if (!phase) {
-        throw new NotFoundException('Phase not found');
-      }
-
-      if (!phase.musics.some((m) => m.music_id == music.music_id)) {
-        throw new BadRequestException(
-          'This Music is not assigned to this Phase',
-        );
-      }
-
-      const identicalScore = await this.scoreRepository.findOne({
+      const validatedScore = await this.scoreRepository.findOne({
         where: {
           player: player,
           event: event,
-          category: category,
           music: music,
-          phase: phase,
-        },
-      });
+          validated: true
+        }
+      })
 
-      if (identicalScore) {
-        throw new BadRequestException(
-          'There can be only one instance of a Score created by a Player to a Music, inside a Category Phase of an Event',
-        );
+      const pendingScore = await this.scoreRepository.findOne({
+        where: {
+          player: player,
+          event: event,
+          music: music,
+          validated: false
+        }
+      })
+
+      if (pendingScore) {
+        throw new BadRequestException("There is already a Score submission waiting for administration approval, wait for the administration to approve it before sending a new score with same MEP")
       }
+
+      const fileName = `scorepic_m${music.music_id}_e${event.event_id}_p${player.player_id}.${mimeType.split('/')[1]}`
+      // scorepic_m1_e2_p3.jpeg or .png
+
+      await this.s3Service.uploadFile(
+        'dancefitscoreboardbucket',
+        fileName,
+        imageBuffer,
+        mimeType,
+      )
+
+      const scorePictureURL = `https://dancefitscoreboardbucket.s3.amazonaws.com/${fileName}`
 
       const {
         value,
@@ -156,8 +139,7 @@ export class ScoresService {
         player: player,
         event: event,
         music: music,
-        category: category,
-        phase: phase,
+        score_picture: scorePictureURL
       });
 
       return await this.scoreRepository.save(newScore);
@@ -331,6 +313,65 @@ export class ScoresService {
     }
 
     return score;
+  }
+
+  async findByEvent(event_id: number) {
+    try {
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const scores = await this.scoreRepository.find({
+        where: {
+          event: event,
+        },
+        relations: {
+          player: true,
+        },
+      });
+
+      return scores;
+    } catch (error) {
+      console.error('Failed fetching scores', error);
+      throw error;
+    }
+  }
+
+  async findPendingByEvent(event_id: number) {
+    try {
+      const event = await this.eventRepository.findOne({
+        where: {
+          event_id: event_id,
+        },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      const pendingScores = await this.scoreRepository.find({
+        where: {
+          event: event,
+          validated: false
+        },
+        relations: {
+          player: true,
+          music: true
+        }
+      })
+
+      return pendingScores
+
+    } catch (error) {
+      console.error('Failed fetching scores', error)
+      throw error
+    }
   }
 
   async update(score_id: number, updateScoreDetails: UpdateScoreParams) {
