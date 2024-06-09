@@ -57,6 +57,9 @@ export class Score {
   @Column()
   created_at: Date;
 
+  @Column({ nullable: true })
+  score_picture: string;
+
   @ManyToOne(() => Player, (player) => player.scores, { onDelete: 'CASCADE' })
   @JoinColumn()
   player: Player;

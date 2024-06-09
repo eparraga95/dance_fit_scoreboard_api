@@ -49,9 +49,9 @@ export class PlayersController {
         .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
     )
     file: Express.Multer.File,
-    @Req() { user },
+    @Req() { player },
   ) {
-    const { player_id } = user;
+    const { player_id } = player;
 
     const buffer = Buffer.from(file.buffer);
 

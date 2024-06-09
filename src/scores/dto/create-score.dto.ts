@@ -26,9 +26,9 @@ export class CreateScoreDto {
   @ApiProperty()
   music_id: number;
   @ApiProperty()
-  category_id: number;
+  category_id?: number;
   @ApiProperty()
-  phase_id: number;
+  phase_id?: number;
 }
 
 export type CreateScoreParams = {
@@ -44,6 +44,6 @@ export type CreateScoreParams = {
   plate: string;
   event_id: number;
   music_id: number;
-  category_id: number;
-  phase_id: number;
+  category_id?: number;
+  phase_id?: number;
 };
