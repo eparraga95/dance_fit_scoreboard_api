@@ -66,7 +66,7 @@ export class ScoresController {
     const createScoreDto: CreateScoreDto = {
       event_id: Number(req.body.event_id),
       music_id: Number(req.body.music_id),
-      plate: req.body.plate,
+      plate: req.body.plate ? req.body.plate : null,
       grade: req.body.grade,
       stage_pass: req.body.stage_pass === 'true' ? true : false,
       max_combo: Number(req.body.max_combo),
