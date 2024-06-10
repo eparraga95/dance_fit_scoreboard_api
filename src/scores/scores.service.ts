@@ -175,10 +175,12 @@ export class ScoresService {
         await this.scoreRepository.remove(oldValidatedScore)
       }
 
-      await this.scoreRepository.update(scoreToValidate, {
+      const updateResult = await this.scoreRepository.update(scoreToValidate.score_id, {
         validated: true,
         score_picture: null
       })
+
+      console.log(updateResult.affected)
 
       return { message: "Score validated successfully"}
 
