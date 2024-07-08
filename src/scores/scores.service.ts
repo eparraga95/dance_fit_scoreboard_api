@@ -82,8 +82,10 @@ export class ScoresService {
         // delete pending score
         await this.scoreRepository.remove(pendingScore)
 
+        const oldPicturefileName = pendingScore.score_picture.split('/').pop()
+
         // remove old score picture upload from s3
-        await this.s3Service.deleteFile('dancefitscoreboardbucket', pendingScore.score_picture)
+        await this.s3Service.deleteFile('dancefitscoreboardbucket', oldPicturefileName)
       }
 
       const fileName = `scorepic_m${music.music_id}_e${event.event_id}_p${player.player_id}.${mimeType.split('/')[1]}`
