@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
 import { get } from 'http';
 import { Request } from 'express';
+import { AdjustComfortLevelDto } from './dto/adjust-comfort_level.dto';
 
 @Controller('comfort-levels')
 export class ComfortLevelsController {
@@ -44,5 +45,11 @@ export class ComfortLevelsController {
   findOneByEventPlayer(@Param('event_id') event_id: string, @Req() request: Request ) {
     const { player_id } = request.player
     return this.comfortLevelsService.findOneByEventPlayer(Number(event_id), Number(player_id))
+  }
+
+  @UseGuards(AdminGuard, AuthGuard)
+  @Patch(':event_id/adjust')
+  adjust(@Param('event_id') event_id: string, @Body() adjustComfortLevelDto: AdjustComfortLevelDto) {
+    return this.comfortLevelsService.adjust(+event_id, adjustComfortLevelDto)
   }
 }
