@@ -284,7 +284,6 @@ export class ComfortLevelsService {
         }
       })
 
-      console.log(scores)
 
       // find within scores, those wich music.level are not in range with new CL + 6 for both modes, if music.mode === "double" use level_double, if music.mode === "single", use level_single
       const scoresNotInRange = scores.filter(score => {
@@ -298,7 +297,6 @@ export class ComfortLevelsService {
         return false;
       });
 
-      console.log(scoresNotInRange)
 
       // delete scores not in range with new player's CL
       await this.scoreRepository.remove(scoresNotInRange);
