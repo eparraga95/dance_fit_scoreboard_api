@@ -7,10 +7,13 @@ export class CreatePlayerDto {
   password: string;
   @ApiProperty()
   confirmPassword: string;
+  @ApiProperty()
+  bar: boolean;
 }
 
 export type CreatePlayerParams = {
   nickname: string;
   password: string;
   confirmPassword: string;
+  bar: boolean
 };

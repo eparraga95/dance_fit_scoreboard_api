@@ -22,7 +22,7 @@ export class PlayersService {
 
   async create(createPlayerDetails: CreatePlayerParams) {
     try {
-      const { nickname, password, confirmPassword } = createPlayerDetails;
+      const { nickname, password, confirmPassword, bar } = createPlayerDetails;
 
       const existingNickname = await this.playerRepository.findOne({
         where: {
