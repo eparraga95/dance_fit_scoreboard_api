@@ -31,6 +31,9 @@ export class Player {
   @Column()
   role: string;
 
+  @Column({ nullable: true })
+  bar: boolean;
+
   @OneToMany(() => Score, (score) => score.player, { onDelete: 'CASCADE' })
   scores: Score[];
 
@@ -43,8 +46,8 @@ export class Player {
   categories: Category[];
 
   @OneToMany(() => ComfortLevel, (comfort_level) => comfort_level.player)
-  comfort_levels: ComfortLevel[]
+  comfort_levels: ComfortLevel[];
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.player)
-  enrollments: Enrollment[]
+  enrollments: Enrollment[];
 }

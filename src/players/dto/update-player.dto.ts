@@ -9,10 +9,13 @@ export class UpdatePlayerDto extends PartialType(CreatePlayerDto) {
   password: string;
   @ApiProperty()
   role: string;
+  @ApiProperty()
+  bar: boolean
 }
 
 export type UpdatePlayerParams = {
   nickname: string;
   password: string;
   role: string;
+  bar: boolean;
 };
