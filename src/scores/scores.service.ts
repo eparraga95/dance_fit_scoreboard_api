@@ -346,8 +346,8 @@ export class ScoresService {
     } catch (error) {}
   }
 
-  async findAll() {
-    return await this.scoreRepository.find({
+  async findAll(page: number = 1, limit: number = 10, order: 'ASC' | 'DESC' = 'DESC') {
+    const [scores, total] = await this.scoreRepository.findAndCount({
       relations: {
         player: true,
         music: true,
@@ -355,7 +355,19 @@ export class ScoresService {
         category: true,
         phase: true,
       },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        created_at: order,
+      },
     });
+  
+    return {
+      data: scores,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: number) {

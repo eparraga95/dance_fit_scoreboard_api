@@ -12,6 +12,7 @@ import {
   ParseFilePipeBuilder,
   HttpStatus,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { ScoresService } from './scores.service';
 import { CreateScoreDto } from './dto/create-score.dto';
@@ -112,8 +113,12 @@ export class ScoresController {
   }
 
   @Get()
-  findAll() {
-    return this.scoresService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('order') order: 'ASC' | 'DESC' = 'DESC'
+  ) {
+    return this.scoresService.findAll(page, limit, order);
   }
 
   @Get(':id')
