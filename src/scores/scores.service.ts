@@ -359,6 +359,7 @@ export class ScoresService {
       take: limit,
       order: {
         created_at: order,
+        score_id: order,
       },
     });
   
